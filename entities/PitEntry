@@ -1,0 +1,72 @@
+{
+  "name": "PitEntry",
+  "type": "object",
+  "properties": {
+    "text": {
+      "type": "string",
+      "title": "Text",
+      "description": "The anonymous entry text"
+    },
+    "emotion_category": {
+      "type": "string",
+      "title": "Emotion Category",
+      "enum": [
+        "SAD",
+        "MAD",
+        "SCARED",
+        "JOYFUL",
+        "POWERFUL",
+        "PEACEFUL",
+        ""
+      ]
+    },
+    "sub_emotion": {
+      "type": "string",
+      "title": "Sub Emotion"
+    },
+    "destination": {
+      "type": "string",
+      "title": "Destination",
+      "enum": [
+        "pit",
+        "void"
+      ],
+      "default": "pit"
+    }
+  },
+  "required": [
+    "text",
+    "destination"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": {
+          "$exists": true
+        }
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.destination": "pit"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
