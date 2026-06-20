@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Daraja Africa Brand Palette — exact from PDF */
+    --background: 38 40% 92%;          /* #F5EFE4 page bg */
+    --foreground: 42 12% 9%;           /* #1C1A14 primary ink */
+    --card: 40 43% 96%;                /* #FDF8F0 card bg */
+    --card-foreground: 42 12% 9%;
+    --popover: 40 43% 96%;
+    --popover-foreground: 42 12% 9%;
+    --primary: 26 74% 41%;             /* #B8671A clay orange */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 112 30% 36%;          /* #4A7A3A sage green */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 36 38% 86%;               /* #E8DCC8 surface */
+    --muted-foreground: 33 14% 23%;    /* #4A4030 muted ink */
+    --accent: 351 77% 81%;             /* #F4A8B8 blush pink */
+    --accent-foreground: 42 12% 9%;
+    --destructive: 26 74% 41%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 36 30% 78%;
+    --input: 36 30% 82%;
+    --ring: 26 74% 41%;
+    --radius: 0.75rem;
+
+    /* Extended brand tokens — PDF exact */
+    --brand-cream: #F5EFE4;            /* page background */
+    --brand-cream-light: #E8DCC8;      /* surface / UI panels */
+    --brand-card: #FDF8F0;             /* pillar cards */
+    --brand-icon-surface: #EDE5D4;     /* icon containers */
+    --brand-cta-surface: #FDE8D0;      /* attention banner */
+    --brand-gold: #B8671A;             /* clay orange — CTA buttons */
+    --brand-gold-dark: #944F10;        /* clay hover */
+    --brand-charcoal: #1C1A14;         /* primary ink */
+    --brand-forest: #4A7A3A;           /* primary green */
+    --brand-leaf: #2E5E22;             /* dark green — hover/headings */
+    --brand-terracotta: #B8671A;       /* alias for clay */
+    --brand-rust: #B8671A;             /* alias for clay */
+    --brand-blush: #F4A8B8;            /* emotional accent */
+    --brand-blush-hover: #E08898;      /* blush hover */
+    --brand-blush-text: #5A1A28;       /* text inside blush button */
+    --brand-gold-accent: #8B6914;      /* footer headings / logo ring */
+    --brand-dark: #1A1A0E;             /* footer background */
+    --brand-dark-mid: #242318;         /* footer emergency card */
+    --brand-body: #4A4030;             /* muted ink / nav text */
+
+    --font-heading: 'DM Serif Display', Georgia, serif;
+    --font-body: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-mono: 'Courier New', Courier, monospace;
+
+    --sidebar-background: 43 53% 90%;
+    --sidebar-foreground: 0 0% 11%;
+    --sidebar-primary: 37 65% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 43 30% 88%;
+    --sidebar-accent-foreground: 0 0% 11%;
+    --sidebar-border: 37 40% 75%;
+    --sidebar-ring: 37 65% 48%;
+  }
+
+  .dark {
+    --background: 0 0% 10%;
+    --foreground: 43 53% 90%;
+    --card: 0 0% 13%;
+    --card-foreground: 43 53% 90%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 43 53% 90%;
+    --primary: 37 65% 48%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 109 27% 37%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 18%;
+    --muted-foreground: 43 20% 65%;
+    --accent: 88 40% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 17 56% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 37 65% 48%;
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 43 53% 90%;
+    --sidebar-primary: 37 65% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 18%;
+    --sidebar-accent-foreground: 43 53% 90%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: 37 65% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+    background-color: #F5EFE4;
+    color: #1C1A14;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #F5EFE4; }
+::-webkit-scrollbar-thumb { background: #B8671A; border-radius: 3px; }
+
+/* Marquee animation */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Pit ghost text float animations */
+@keyframes floatUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  10% { opacity: 0.12; }
+  85% { opacity: 0.08; }
+  100% { opacity: 0; transform: translateY(-80px); }
+}
+.ghost-text {
+  animation: floatUp linear infinite;
+}
+
+/* Blinking cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Feelings wheel hover */
+.wheel-segment {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform-origin: center;
+}
+.wheel-segment:hover {
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+/* Pit page dark override */
+.pit-page {
+  background-color: #0D0D0D;
+  color: #E8E0D4;
+  min-height: 100vh;
+}
+
+/* Scrollbar hidden */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
