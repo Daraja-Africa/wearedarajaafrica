@@ -173,7 +173,19 @@ export default function Resources() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
-  const allResources = [...resources, ...amariResources];
+  // Reorder: Amari first, then WHO (id 11), UNICEF (id 7), then mix rest
+  const priorityIds = [101, 11, 7];
+  const priorityResources = [...amariResources.slice(0, 1), resources.find(r => r.id === 11), resources.find(r => r.id === 7)];
+  const remainingAmari = amariResources.slice(1);
+  const remainingMain = resources.filter(r => r.id !== 11 && r.id !== 7);
+  // Interleave remaining
+  const mixed = [];
+  const maxLen = Math.max(remainingMain.length, remainingAmari.length);
+  for (let i = 0; i < maxLen; i++) {
+    if (remainingMain[i]) mixed.push(remainingMain[i]);
+    if (remainingAmari[i]) mixed.push(remainingAmari[i]);
+  }
+  const allResources = [...priorityResources, ...mixed];
   const filtered = allResources.filter(r => {
     const matchSearch = r.title.toLowerCase().includes(search.toLowerCase()) ||
       r.desc.toLowerCase().includes(search.toLowerCase()) ||
@@ -196,6 +208,7 @@ export default function Resources() {
           {/* Quick FAQ */}
           <div className="mt-10 text-left max-w-2xl mx-auto space-y-4">
             {[
+              { q: 'Is Daraja Africa free?', a: null, isFirst: true },
               { q: 'What happens in a peer circle?', a: 'A trained peer facilitator guides a small, safe group session where participants share experiences, listen without judgment, and support each other. Everything shared stays within the group.' },
               { q: 'How can my school invite Daraja Africa?', a: 'Reach out via the Get Involved page to apply as a partner school. We\'ll connect with your administration to schedule outreach sessions and health pop-up days.' },
               { q: 'Are these resources free?', a: 'Yes — all resources on this page are free and publicly accessible. We believe mental health support should not be gated by cost.' },
@@ -204,7 +217,19 @@ export default function Resources() {
                 <summary className="font-semibold text-brand-charcoal text-sm list-none flex justify-between items-center gap-2">
                   {faq.q} <span className="text-brand-gold text-lg shrink-0">+</span>
                 </summary>
-                <p className="mt-3 text-sm text-brand-body leading-relaxed">{faq.a}</p>
+                {faq.isFirst ? (
+                  <p className="mt-3 text-sm text-brand-body leading-relaxed">
+                    Yes. Daraja Africa provides its services free of charge. For guidance and sign-up information, visit the{' '}
+                    <a href="/get-involved" className="text-brand-gold hover:underline font-medium">Get Involved page</a>{' '}
+                    for{' '}
+                    <a href="/get-involved" className="text-brand-gold hover:underline font-medium">volunteer opportunities</a>{' '}
+                    and{' '}
+                    <a href="/get-involved" className="text-brand-gold hover:underline font-medium">school partnership</a>{' '}
+                    information.
+                  </p>
+                ) : (
+                  <p className="mt-3 text-sm text-brand-body leading-relaxed">{faq.a}</p>
+                )}
               </details>
             ))}
           </div>

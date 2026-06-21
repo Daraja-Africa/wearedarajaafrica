@@ -191,7 +191,7 @@ export default function Announcements() {
       <section className="py-14 px-4 border-t border-brand-gold/15">
         <div className="max-w-lg mx-auto text-center">
           <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-2">Stay connected with our journey.</h2>
-          <p className="text-brand-body text-sm mb-6">Get event recaps, upcoming peer circle dates, and Daraja news — no spam, ever.</p>
+          <p className="text-brand-body text-sm mb-6">Get event recaps, upcoming peer circle dates, and Daraja Africa news — no spam, ever.</p>
           <NewsletterSignup />
         </div>
       </section>
