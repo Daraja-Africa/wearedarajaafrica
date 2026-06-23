@@ -10,7 +10,7 @@ export default function Home() {
       {/* LOGO + TAGLINE */}
       <div className="flex flex-col items-center pt-12 pb-6 px-4">
         <img
-          src="/1bd0c3516_DarajaAfrLogo-01.jpg"
+          src="/images/Daraja Afr Logo-01.jpg"
           alt="Daraja Africa"
           className="h-52 sm:h-72 md:h-96 w-auto object-contain mix-blend-multiply" />
         

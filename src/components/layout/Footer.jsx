@@ -37,7 +37,7 @@ export default function Footer() {
           {/* Column 1: Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <img
-              src="/1bd0c3516_DarajaAfrLogo-01.jpg"
+              src="/images/Daraja Afr Logo-01.jpg"
               alt="Daraja Africa"
               className="h-16 w-auto object-contain mb-4"
               style={{ filter: 'brightness(0) invert(1)' }}
