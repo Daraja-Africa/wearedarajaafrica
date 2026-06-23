@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, ArrowRight, Phone, Instagram, Video } from 'lucide-react';
+import { ArrowRight, Phone, Instagram, Video } from 'lucide-react';
 
 export default function GetInvolved() {
   return (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, AlertCircle, ExternalLink, Send } from 'lucide-react';
+import { Phone, AlertCircle, ExternalLink } from 'lucide-react';
 
 const sections = [
 {

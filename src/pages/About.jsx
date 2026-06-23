@@ -54,19 +54,19 @@ const teamMembers = [
     name: 'Iteyo Khaisia',
     role: 'Founder',
     desc: 'Visionary leader focused on harnessing peer resources to bridge the mental health gap.',
-    image: 'https://media.base44.com/images/public/6a2c406ed74dbec7d1ceb134/8bbf1c8d5_IMG-20260620-WA0006.jpg',
+    image: '/8bbf1c8d5_IMG-20260620-WA0006.jpg',
   },
   {
     name: 'Basma Issack',
     role: 'Co-Founder',
     desc: 'Advocate dedicated to breaking the stigma and creating safe spaces for youth.',
-    image: 'https://media.base44.com/images/public/6a2c406ed74dbec7d1ceb134/c60cecbad_IMG-20260620-WA0007.jpg',
+    image: '/c60cecbad_IMG-20260620-WA0007.jpg',
   },
   {
     name: 'Sheila Ngome',
     role: 'Counseling Psychologist',
     desc: 'Former school principal and rehabilitation specialist grounding the team in clinical expertise.',
-    image: 'https://media.base44.com/images/public/6a2c406ed74dbec7d1ceb134/824b26a96_All_Video_Downloader_684823214_18094055003023597_8483401925228313783_njpgpng.jpg',
+    image: '/824b26a96_All_Video_Downloader_684823214_18094055003023597_8483401925228313783_njpgpng.jpg',
   },
 ];
 

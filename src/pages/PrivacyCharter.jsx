@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, Lock, Eye, Trash2, Mail, Users, RefreshCw, AlertCircle } from 'lucide-react';
+import { Shield, Lock, Eye, Mail, Users, RefreshCw, AlertCircle } from 'lucide-react';
 
 const sections = [
   {

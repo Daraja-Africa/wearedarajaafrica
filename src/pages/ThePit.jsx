@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, X } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import { supabase } from '../lib/supabase.js';
 
 // ─── GHOST TEXT background ───────────────────────────────────────────────────
 const ghostTexts = [
@@ -167,13 +167,6 @@ function isInappropriate(text) {
   return BAD_WORDS.some(w => text.toLowerCase().includes(w));
 }
 
-// ─── WITNESS MODE entries ────────────────────────────────────────────────────
-const mockWitnessEntries = ghostTexts.map((t, i) => ({
-  id: i, text: t,
-  emotion_category: ['SAD', 'MAD', 'SCARED', 'JOYFUL', 'POWERFUL', 'PEACEFUL'][i % 6],
-  sub_emotion: ['lonely', 'frustrated', 'anxious', 'hopeful', 'confident', 'content'][i % 6],
-}));
-
 // ─── MAIN COMPONENT ─────────────────────────────────────────────────────────
 export default function ThePit() {
   const [mode, setMode] = useState('select'); // select | write | name | released | void | witness | conduct
@@ -182,7 +175,7 @@ export default function ThePit() {
   const [emotion, setEmotion] = useState(null);
   const [conductAccepted, setConductAccepted] = useState(false);
   const [inappropriateDetected, setInappropriateDetected] = useState(false);
-  const [witnessEntries, setWitnessEntries] = useState(mockWitnessEntries);
+  const [witnessEntries, setWitnessEntries] = useState([]);
   const [status, setStatus] = useState('WAITING FOR RESOLVE_');
   const textareaRef = useRef(null);
 
@@ -195,15 +188,24 @@ export default function ThePit() {
 
   // Load real pit entries for witness mode
   useEffect(() => {
-    if (mode === 'witness') {
-      base44.entities.PitEntry.filter({ destination: 'pit' }, '-created_date', 30)
-        .then(entries => {
-          if (entries && entries.length > 0) {
-            setWitnessEntries(entries);
-          }
-        })
-        .catch(() => {});
-    }
+    if (mode !== 'witness') return;
+
+    const fetchEntries = async () => {
+      const { data, error } = await supabase
+        .from('pit_entries')
+        .select('*')
+        .eq('destination', 'pit')
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+      if (!error && data) {
+        setWitnessEntries(data);
+      } else if (error) {
+        console.error("Error fetching pit entries:", error);
+      }
+    };
+
+    fetchEntries();
   }, [mode]);
 
   const handleDestinationSelect = (dest) => {
@@ -237,14 +239,21 @@ export default function ThePit() {
   const handleRelease = async () => {
     setStatus('RESOLVING_');
     if (destination === 'pit' && !inappropriateDetected) {
-      try {
-        await base44.entities.PitEntry.create({
+      const { data, error } = await supabase
+        .from('pit_entries')
+        .insert([{
           text: entryText,
           emotion_category: emotion?.category || '',
           sub_emotion: emotion?.sub || '',
-          destination: 'pit',
-        });
-      } catch (e) {}
+          destination: 'pit'
+        }])
+        .select();
+
+      if (!error && data) {
+        setWitnessEntries(prev => [data[0], ...prev]);
+      } else if (error) {
+        console.error("Error inserting pit entry:", error);
+      }
     }
     setMode(destination === 'void' || inappropriateDetected ? 'void' : 'released');
     setStatus('RESOLVED_');
@@ -287,7 +296,7 @@ export default function ThePit() {
         <Link to="/" className="font-mono text-sm font-bold flex items-center gap-2" style={{ color: '#C9972A' }}>
           <ArrowLeft className="w-4 h-4" />
           <img
-            src="https://media.base44.com/images/public/user_6a2ac434681f299904d3a76b/37ec6e1b6_IMG-20260609-WA0015.jpg"
+            src="/37ec6e1b6_IMG-20260609-WA0015.jpg"
             alt="Daraja Africa"
             className="h-7 w-auto object-contain opacity-80"
           />

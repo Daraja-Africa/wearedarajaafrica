@@ -41,7 +41,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img
-              src="https://media.base44.com/images/public/6a2c406ed74dbec7d1ceb134/1bd0c3516_DarajaAfrLogo-01.jpg"
+              src="/1bd0c3516_DarajaAfrLogo-01.jpg"
               alt="Daraja Africa"
               className="h-10 w-auto object-contain"
             />
