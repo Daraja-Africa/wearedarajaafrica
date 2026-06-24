@@ -10,21 +10,20 @@ const sections = [
   { org: 'NACADA', desc: '24/7 toll-free helpline offering counseling, advice and referrals for alcohol/drug problems.', number: '1192', hours: '24/7', website: 'nacada.go.ke' },
   { org: 'HealthCare Assistance Kenya (HAK)', desc: 'National GBV hotline providing immediate counseling, medical referrals, legal aid and psychosocial support.', number: '1195', hours: '24/7', website: 'hakgbv1195.org' },
   { org: 'Kimbilio Trust', desc: 'Free counseling, advocacy, legal aid and shelter support for survivors of abuse.', number: '1193', hours: '24/7', website: 'kimbiliotrust.com' },
-  { org: 'Befrienders Kenya', desc: 'Free, confidential listening support for people in distress or thinking about suicide. No judgment or advice.', number: '0722-178-177', hours: 'Mon–Sun, 7AM–7PM', website: 'befrienderskenya.org' },
   { org: 'Centre for Rights, Education and Awareness (CREAW)', desc: '24/7 toll-free hotline for survivors of gender violence; offers free legal aid, psychosocial counseling, and emergency referrals.', number: '0800-720-186', hours: '24/7', website: 'creawkenya.org' },
   { org: 'National Emergency Services', desc: 'For any emergency — police, ambulance, fire. Call immediately if life is at risk.', number: '999 / 112', hours: '24/7' }]
 
 },
+
 {
+
   name: 'Teen & Youth Mental Health Services',
   color: '#4A7A3A',
   lines: [
   { org: 'Childline Kenya', desc: '24/7 toll-free helpline providing immediate counseling, referrals and child protection for children and teens facing abuse, neglect or emotional crises.', number: '116', hours: '24/7', website: 'childlinekenya.co.ke' },
-  { org: 'Mental 360', desc: 'Youth-led nonprofit running mental health awareness campaigns, peer support groups, art therapy and affordable counseling.', number: '+254-710-360-360', hours: 'Toll-free', website: 'mental360.or.ke' },
-  { org: 'Tele-Counseling Hotline (LVCT Health)', desc: '24/7 toll-free hotline offering tele-counseling and referrals for emotional, stress or relationship issues. Peer counselors available for youth.', number: '1190', hours: '24/7', website: 'lvcthealth.org' },
-  { org: 'NACOSTI/Ushauri Helpline', desc: 'Toll-free helpline offering counseling on sexual health, HIV/AIDS and related stress for young people.', number: '0800-724-848', hours: 'Weekdays', website: 'nascop.go.ke' }]
+  { org: 'Tele-Counseling Hotline (LVCT Health)', desc: '24/7 toll-free hotline offering tele-counseling and referrals for emotional, stress or relationship issues. Peer counselors available for youth.', number: '1190', hours: '24/7', website: 'lvcthealth.org' }]
+}
 
-},
 {
   name: 'Counseling & Therapy Resources',
   color: '#6B8CAE',
@@ -38,7 +37,6 @@ const sections = [
   name: 'Community & NGO Support Services',
   color: '#B8671A',
   lines: [
-  { org: 'Kenya Alliance for Mental Health (KAMH)', desc: 'NGO coalition for mental health advocacy. Provides public education, peer counselor training, school programs and workshops to reduce stigma.', number: 'No helpline', hours: 'See website', website: 'kamh.ngo' },
   { org: 'Africa Mental Health Foundation (AMHF)', desc: 'Mental health research and training organization. Community projects and training in low-resource settings.', number: 'Email only', hours: 'See website', website: 'ccgmh.org' },
   { org: 'Ministry of Health – Mental Health Department', desc: "Oversees Kenya's mental health programs and policies. Website provides official resources, policies and updates.", number: 'No hotline', hours: 'Website only', website: 'mental.health.go.ke' }]
 
