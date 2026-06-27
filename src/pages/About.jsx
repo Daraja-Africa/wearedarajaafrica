@@ -111,7 +111,7 @@ export default function About() {
         <div className="max-w-4xl mx-auto space-y-6">
 
           {/* Mission */}
-          <div className="rounded-xl p-5 md:p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', borderLeft: '4px solid #B8671A', border: '1px solid rgba(184,103,26,0.12)' }}>
+          <div className="rounded-xl p-5 md:p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.08)', borderTop: '4px solid #4A7A3A' }}>
             <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-3">Our Mission</h2>
             <p className="font-body text-brand-body leading-relaxed">
               Daraja Africa empowers young people through empathy-driven education, peer connection and professional guidance, bridging the mental health gap within high schools.
@@ -119,7 +119,7 @@ export default function About() {
           </div>
 
           {/* Vision */}
-          <div className="rounded-xl p-5 md:p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', borderLeft: '4px solid #4A7A3A', border: '1px solid rgba(74,122,58,0.12)' }}>
+          <div className="rounded-xl p-5 md:p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.08)', borderTop: '4px solid #4A7A3A' }}>
             <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-3">Our Vision</h2>
             <p className="font-body text-brand-body leading-relaxed">
               A mentally healthy generation of African students empowered to rise with hope, compassion, and resilience, transforming their schools and communities into spaces where every young person feels seen, supported, and valued.

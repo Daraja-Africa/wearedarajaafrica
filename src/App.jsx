@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
@@ -5,36 +6,104 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 
 import MainLayout from './components/layout/MainLayout';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import LoadingSkeleton from '@/components/LoadingSkeleton';
 
-import Home from './pages/Home';
-import About from './pages/About';
-import Programs from './pages/Programs';
-import Resources from './pages/Resources';
-import Gallery from './pages/Gallery';
-import GetInvolved from './pages/GetInvolved';
-import GetHelp from './pages/GetHelp';
-import Announcements from './pages/Announcements';
-import ThePit from './pages/ThePit';
-import PrivacyCharter from './pages/PrivacyCharter';
-import DataDeletion from './pages/DataDeletion';
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Programs = lazy(() => import('./pages/Programs'));
+const Resources = lazy(() => import('./pages/Resources'));
+const Gallery = lazy(() => import('./pages/Gallery'));
+const GetInvolved = lazy(() => import('./pages/GetInvolved'));
+const GetHelp = lazy(() => import('./pages/GetHelp'));
+const Announcements = lazy(() => import('./pages/Announcements'));
+const ThePit = lazy(() => import('./pages/ThePit'));
+const PrivacyCharter = lazy(() => import('./pages/PrivacyCharter'));
+const DataDeletion = lazy(() => import('./pages/DataDeletion'));
 
 function App() {
   return (
     <QueryClientProvider client={queryClientInstance}>
       <Router>
         <Routes>
-          <Route path="/the-pit" element={<ThePit />} />
+          <Route path="/the-pit" element={
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingSkeleton />}>
+                <ThePit />
+              </Suspense>
+            </ErrorBoundary>
+          } />
           <Route element={<MainLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/programs" element={<Programs />} />
-            <Route path="/resources" element={<Resources />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/get-involved" element={<GetInvolved />} />
-            <Route path="/get-help" element={<GetHelp />} />
-            <Route path="/announcements" element={<Announcements />} />
-            <Route path="/privacy-charter" element={<PrivacyCharter />} />
-            <Route path="/data-deletion" element={<DataDeletion />} />
+            <Route path="/" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <Home />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/about" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <About />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/programs" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <Programs />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/resources" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <Resources />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/gallery" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <Gallery />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/get-involved" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <GetInvolved />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/get-help" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <GetHelp />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/announcements" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <Announcements />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/privacy-charter" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <PrivacyCharter />
+                </Suspense>
+              </ErrorBoundary>
+            } />
+            <Route path="/data-deletion" element={
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <DataDeletion />
+                </Suspense>
+              </ErrorBoundary>
+            } />
           </Route>
           <Route path="*" element={<PageNotFound />} />
         </Routes>

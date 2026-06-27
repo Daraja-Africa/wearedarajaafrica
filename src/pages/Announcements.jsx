@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-// useState already imported above — NewsletterSignup uses it too
 import { ChevronDown, Loader2 } from 'lucide-react';
+import { supabase } from "@/lib/supabase";
 
 const initialAnnouncements = [
 {
@@ -201,28 +201,85 @@ export default function Announcements() {
 
 function NewsletterSignup() {
   const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
-  return done ?
-  <p className="text-brand-forest font-semibold">You're subscribed. Thank you! 🌿</p> :
+  const [error, setError] = useState("");
 
-  <div className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
+  async function handleSubscribe() {
+    setError("");
+
+    if (!email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const { data, error: supabaseError } = await supabase
+        .from('newsletter_subscribers')
+        .insert([{ email: email.trim() }])
+        .select();
+
+      if (supabaseError) {
+        if (supabaseError.message?.includes('duplicate') || supabaseError.code === '23505') {
+          throw new Error("You're already subscribed.");
+        }
+        throw supabaseError;
+      }
+
+      if (data) {
+        setDone(true);
+        setEmail('');
+      } else {
+        throw new Error("Subscription failed. Please try again.");
+      }
+    } catch (err) {
+      console.error('Newsletter subscription error:', err);
+      setError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (done) {
+    return <p className="text-brand-forest font-semibold">You're subscribed. Thank you! 🌿</p>;
+  }
+
+  return (
+    <div className="flex flex-col sm:flex-row gap-3 max-w-sm mx-auto">
       <input
-      type="email"
-      placeholder="your@email.com"
-      value={email}
-      onChange={(e) => setEmail(e.target.value)}
-      className="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none border"
-      style={{ backgroundColor: '#E8DCC8', borderColor: 'rgba(184,103,26,0.3)', color: '#1C1A14', fontFamily: 'var(--font-body)' }} />
-    
+        type="email"
+        placeholder="your@email.com"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        disabled={submitting}
+        className="flex-1 px-4 py-3 rounded-xl text-sm focus:outline-none border disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{ backgroundColor: '#E8DCC8', borderColor: 'rgba(184,103,26,0.3)', color: '#1C1A14', fontFamily: 'var(--font-body)' }}
+      />
       <button
-      onClick={() => {if (email.includes('@')) setDone(true);}}
-      className="px-6 py-3 rounded-xl font-semibold text-sm transition-all"
-      style={{ backgroundColor: '#F4A8B8', color: '#5A1A28' }}
-      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E08898'}
-      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#F4A8B8'}>
-      
-        Subscribe
+        onClick={handleSubscribe}
+        disabled={submitting}
+        className="px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{ backgroundColor: '#F4A8B8', color: '#5A1A28' }}
+        onMouseEnter={(e) => { if (!submitting) e.currentTarget.style.backgroundColor = '#E08898'; }}
+        onMouseLeave={(e) => { if (!submitting) e.currentTarget.style.backgroundColor = '#F4A8B8'; }}
+      >
+        {submitting ? "Subscribing..." : "Subscribe"}
       </button>
-    </div>;
-
+      {error && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2 mt-2" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
 }

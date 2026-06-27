@@ -37,10 +37,9 @@ export default function Footer() {
           {/* Column 1: Brand */}
           <div className="sm:col-span-2 lg:col-span-1">
             <img
-              src="/images/Daraja Afr Logo-01.jpg"
+              src="/images/daraja-logo-transparent.png"
               alt="Daraja Africa"
-              className="h-16 w-auto object-contain mb-4"
-              style={{ filter: 'brightness(0) invert(1)' }}
+              className="h-16 sm:h-20 w-auto object-contain mb-4 mix-blend-screen"
             />
             <p className="text-xs leading-relaxed mb-3" style={{ color: '#5A5248' }}>
               © {new Date().getFullYear()} Daraja Africa. All rights reserved.

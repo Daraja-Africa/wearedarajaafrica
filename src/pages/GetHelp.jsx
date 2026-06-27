@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Phone, AlertCircle, ExternalLink, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { submitSupportRequest } from "@/api/moderation";
 
 const sections = [
   {
@@ -147,6 +147,15 @@ export default function GetHelp() {
       return;
     }
 
+    const trimmedContact = supportContact.trim();
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedContact);
+    const isValidPhone = /^[\+]?[\d][\d\s\-()+.]{2,}$/.test(trimmedContact);
+
+    if (!isValidEmail && !isValidPhone) {
+      setSubmitError("Please enter a valid email address or phone number.");
+      return;
+    }
+
     if (!supportType) {
       setSubmitError("Please select a support type.");
       return;
@@ -154,24 +163,24 @@ export default function GetHelp() {
 
     setSubmitting(true);
 
-    const { error } = await supabase.from("support_requests").insert({
-      support_name: supportName.trim(),
-      support_contact: supportContact.trim(),
-      support_type: supportType,
-      status: "pending",
-    });
-
-    setSubmitting(false);
-
-    if (error) {
-      setSubmitError("Something went wrong. Please try again.");
-      return;
+    try {
+      await submitSupportRequest({
+        support_name: supportName.trim(),
+        support_contact: supportContact.trim(),
+        support_type: supportType,
+      });
+      setSupportName("");
+      setSupportContact("");
+      setSupportType("");
+      setSupportSent(true);
+    } catch (error) {
+      console.error("Support request error:", error);
+      setSubmitError(
+        error?.message || "Something went wrong. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
     }
-
-    setSupportName("");
-    setSupportContact("");
-    setSupportType("");
-    setSupportSent(true);
   }
 
   return (
@@ -203,8 +212,6 @@ export default function GetHelp() {
           </p>
         </div>
 
-        {/* The Void — Anonymous Venting Box */}
-
         {/* Support Form */}
         <div
           className="mb-14 rounded-2xl p-8 border"
@@ -221,7 +228,7 @@ export default function GetHelp() {
             this in and we'll reach out.
           </p>
           {!supportSent ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               <div>
                 <label
                   htmlFor="support-name"
@@ -265,6 +272,7 @@ export default function GetHelp() {
                     color: "#1C1A14",
                     fontFamily: "var(--font-body)",
                   }}
+                  aria-required="true"
                 />
               </div>
 
@@ -286,6 +294,7 @@ export default function GetHelp() {
                     color: supportType ? "#1C1A14" : "#9A8E7E",
                     fontFamily: "var(--font-body)",
                   }}
+                  aria-required="true"
                 >
                   <option value="">I'd like to...</option>
                   <option value="circle">Join a peer circle</option>
@@ -294,7 +303,7 @@ export default function GetHelp() {
               </div>
 
               {submitError && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2" role="alert">
                   {submitError}
                 </p>
               )}
@@ -359,7 +368,7 @@ export default function GetHelp() {
                             <span>{line.hours}</span>
                             {line.website && (
                               <>
-                                <span>·</span>
+                                <span aria-hidden="true">·</span>
                                 <a
                                   href={`https://${line.website}`}
                                   target="_blank"

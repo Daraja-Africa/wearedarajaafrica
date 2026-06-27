@@ -33,17 +33,17 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`sticky top-0 z-40 w-full transition-all duration-300 backdrop-blur-md ${
+    <nav className={`sticky top-0 z-40 w-full transition-all duration-300 ${
       scrolled ? 'shadow-sm' : ''
-    }`} style={{ backgroundColor: 'rgba(245,239,228,0.95)', borderBottom: '1px solid rgba(184,103,26,0.2)' }}>
+    }`} style={{ backgroundColor: '#F5EFE4', borderBottom: '1px solid rgba(184,103,26,0.2)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img
-              src="/images/Daraja Afr Logo-01.jpg"
+              src="/images/daraja-logo-transparent.png"
               alt="Daraja Africa"
-              className="h-10 w-auto object-contain"
+              className="h-10 w-auto object-contain mix-blend-multiply"
             />
             <span className="font-display font-bold text-sm tracking-wide uppercase">
               <span style={{ color: '#1C1A14' }}>Daraja </span><span style={{ color: '#8B6430' }}>Africa</span>
@@ -99,7 +99,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="lg:hidden backdrop-blur-md" style={{ borderTop: '1px solid rgba(184,103,26,0.2)', backgroundColor: 'rgba(245,239,228,0.98)' }}>
+        <div className="lg:hidden" style={{ borderTop: '1px solid rgba(184,103,26,0.2)', backgroundColor: '#F5EFE4' }}>
           <div className="px-4 py-3 space-y-1">
             {navLinks.map((link) => (
               <Link

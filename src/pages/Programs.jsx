@@ -25,7 +25,7 @@ export default function Programs() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
 
             {/* High School Outreach */}
-            <div className="rounded-2xl p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', borderTop: '4px solid #4A7A3A', border: '1px solid rgba(74,122,58,0.1)' }}>
+            <div className="rounded-2xl p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.08)', borderTop: '4px solid #4A7A3A' }}>
               <div className="mb-4 p-2.5 rounded-xl inline-block" style={{ backgroundColor: 'rgba(74,122,58,0.1)' }}>
                 <BookOpen className="w-6 h-6" style={{ color: '#4A7A3A' }} />
               </div>
@@ -43,7 +43,7 @@ export default function Programs() {
             </div>
 
             {/* Peer Support Circles */}
-            <div className="rounded-2xl p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', borderTop: '4px solid #4A7A3A', border: '1px solid rgba(74,122,58,0.1)' }}>
+            <div className="rounded-2xl p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.08)', borderTop: '4px solid #4A7A3A' }}>
               <div className="mb-4 p-2.5 rounded-xl inline-block" style={{ backgroundColor: 'rgba(74,122,58,0.1)' }}>
                 <Users className="w-6 h-6" style={{ color: '#4A7A3A' }} />
               </div>

@@ -10,7 +10,7 @@ export default function Home() {
       {/* LOGO + TAGLINE */}
       <div className="flex flex-col items-center pt-12 pb-6 px-4">
         <img
-          src="/images/Daraja Afr Logo-01.jpg"
+          src="/images/daraja-logo-transparent.png"
           alt="Daraja Africa"
           className="h-52 sm:h-72 md:h-96 w-auto object-contain mix-blend-multiply" />
         
@@ -32,8 +32,9 @@ export default function Home() {
       </section>
 
       {/* WHO WE ARE */}
-      <section className="py-16 md:py-24 px-4 border-t border-brand-gold/10">
-        <div className="max-w-5xl mx-auto">
+      <section className="py-16 md:py-24 px-4 border-t border-brand-gold/10 relative">
+        <div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-15" style={{ backgroundImage: 'url(/images/IMG-20260625-WA0007-2.jpg)' }}></div>
+        <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-charcoal mb-4">Who We Are</h2>
             <p className="text-brand-body text-lg leading-relaxed max-w-3xl mx-auto">
@@ -49,7 +50,7 @@ export default function Home() {
             { label: 'Professional Counseling', desc: 'We provide expert guidance from licensed psychologists to handle deep trauma and addiction.' },
             { label: 'School Partnerships', desc: 'We create embedded safe spaces where students feel seen, understood, and supported.' }].
             map((item, i) =>
-            <div key={i} className="rounded-2xl p-6 shadow-sm hidden" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(184,103,26,0.1)' }}>
+             <div key={i} className="rounded-2xl p-6 shadow-sm hidden" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.15)' }}>
                 <h3 className="font-display text-lg font-bold mb-2 text-brand-charcoal">{item.label}</h3>
                 <p className="text-sm text-brand-body leading-relaxed">{item.desc}</p>
               </div>
@@ -59,7 +60,7 @@ export default function Home() {
       </section>
 
       {/* WHY SUPPORT */}
-      <section className="py-16 md:py-24 px-4 border-t border-brand-gold/10" style={{ backgroundColor: '#EDE8DF' }}>
+      <section className="py-16 md:py-24 px-4 border-t border-brand-gold/10" style={{ backgroundColor: '#E8DCC8' }}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10 md:mb-14">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-charcoal mb-4">Why Support Daraja Africa?</h2>
@@ -115,7 +116,7 @@ export default function Home() {
             { label: 'Awareness', desc: 'Dismantling social stigmas in schools through clear, open education.' },
             { label: 'Support', desc: 'Providing sound guidance backed by expert psychological steering advisors.' }].
             map((val, i) =>
-            <div key={i} className="rounded-2xl p-6 shadow-sm" style={{ backgroundColor: '#FDF8F0', borderTop: '3px solid #4A7A3A', border: '1px solid rgba(74,122,58,0.1)' }}>
+             <div key={i} className="rounded-2xl p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.08)', borderTop: '4px solid #4A7A3A', boxShadow: '0 1px 3px rgba(74,122,58,0.05)' }}>
                 <h3 className="font-display text-lg font-bold mb-2" style={{ color: '#4A7A3A' }}>{val.label}</h3>
                 <p className="text-sm text-brand-body leading-relaxed">{val.desc}</p>
               </div>

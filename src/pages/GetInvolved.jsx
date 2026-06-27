@@ -18,9 +18,9 @@ export default function GetInvolved() {
         <div className="max-w-5xl mx-auto space-y-10">
 
           {/* Volunteer Card */}
-          <div className="rounded-2xl p-6 md:p-10" style={{ backgroundColor: '#1C1A14' }}>
-            <h2 className="font-display text-2xl font-bold text-white mb-2">Volunteer with Daraja Africa</h2>
-            <p className="text-white/60 text-sm leading-relaxed mb-6">
+          <div className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
+            <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>Volunteer with Daraja Africa</h2>
+            <p className="text-brand-body/70 text-sm leading-relaxed mb-6">
               Join our network of community advocates and peer counselors working to normalise mental health conversations across Sub-Saharan Africa.
             </p>
             <a
@@ -37,9 +37,9 @@ export default function GetInvolved() {
           </div>
 
           {/* School Partnerships Card */}
-          <div className="rounded-2xl p-6 md:p-10" style={{ backgroundColor: '#1C1A14' }}>
-            <h2 className="font-display text-2xl font-bold text-white mb-2">School &amp; Organization Partnerships</h2>
-            <p className="text-white/60 text-sm leading-relaxed mb-6">
+          <div className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
+            <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>School &amp; Organization Partnerships</h2>
+            <p className="text-brand-body/70 text-sm leading-relaxed mb-6">
               Partner with Daraja Africa to support school mental health programs and outreach initiatives.
             </p>
             <a
@@ -56,34 +56,34 @@ export default function GetInvolved() {
           </div>
 
           {/* Get In Touch */}
-          <div id="get-in-touch" className="rounded-2xl p-6 md:p-10" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(184,103,26,0.2)' }}>
-            <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-2">Get in Touch</h2>
-            <p className="text-brand-body text-sm mb-6 leading-relaxed">
+          <div id="get-in-touch" className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
+            <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>Get in Touch</h2>
+            <p className="text-brand-body/80 text-sm mb-6 leading-relaxed">
               Reach out directly to connect with the Daraja Africa team — whether you're a prospective volunteer, partner, or supporter.
             </p>
             <div className="flex flex-col gap-5">
-              <a href="tel:+254748047581" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-gold transition-colors">
-                <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#EDE5D4' }}>
-                  <Phone className="w-5 h-5 text-brand-gold" />
-                </div>
+<a href="tel:+254748047581" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
+                 <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#E8DCC8' }}>
+                   <Phone className="w-5 h-5" style={{ color: '#4A7A3A' }} />
+                 </div>
                 <div>
                   <p className="text-xs text-brand-body/60 uppercase tracking-wide font-semibold">Phone</p>
                   <p className="text-sm font-semibold">+254 748 047 581</p>
                 </div>
               </a>
-              <a href="https://instagram.com/daraja_africa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-gold transition-colors">
-                <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#EDE5D4' }}>
-                  <Instagram className="w-5 h-5 text-brand-gold" />
-                </div>
+<a href="https://instagram.com/daraja_africa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
+                 <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#E8DCC8' }}>
+                   <Instagram className="w-5 h-5" style={{ color: '#4A7A3A' }} />
+                 </div>
                 <div>
                   <p className="text-xs text-brand-body/60 uppercase tracking-wide font-semibold">Instagram</p>
                   <p className="text-sm font-semibold">@daraja_africa</p>
                 </div>
               </a>
-              <a href="https://tiktok.com/@daraja_africa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-gold transition-colors">
-                <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#EDE5D4' }}>
-                  <Video className="w-5 h-5 text-brand-gold" />
-                </div>
+<a href="https://tiktok.com/@daraja_africa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
+                 <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#E8DCC8' }}>
+                   <Video className="w-5 h-5" style={{ color: '#4A7A3A' }} />
+                 </div>
                 <div>
                   <p className="text-xs text-brand-body/60 uppercase tracking-wide font-semibold">TikTok</p>
                   <p className="text-sm font-semibold">@daraja_africa</p>
