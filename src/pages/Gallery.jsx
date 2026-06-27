@@ -2,175 +2,168 @@ import React, { useState } from 'react';
 
 const galleryItems = [
   {
-    id: 1, prompt: 'Stillness After Chaos', color: '#C9972A', height: 'h-64',
-    desc: 'Finding quiet moments of peace in the aftermath of emotional turbulence — a space where youth can breathe again.',
-    image: '/images/IMG-20260625-WA0008.jpg',
-    country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
-  },
-  {
-    id: 2, prompt: 'The Weight of Silence', color: '#4A7C3F', height: 'h-48',
+    id: 1, prompt: 'The Weight of Silence', color: '#4A7C3F', height: 'h-48',
     desc: 'Exploring what it feels like to carry unexpressed grief in a culture that valorises strength and endurance.',
     image: '/images/IMG-20260625-WA0010.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 3, prompt: 'Roots That Hold', color: '#A0522D', height: 'h-80',
+    id: 2, prompt: 'Roots That Hold', color: '#A0522D', height: 'h-80',
     desc: 'Ubuntu philosophy rendered in texture — depicting interconnection as the source of personal resilience and collective healing.',
     image: '/images/IMG-20260625-WA0011.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 4, prompt: 'Before the Rain', color: '#6B8CAE', height: 'h-56',
+    id: 3, prompt: 'Before the Rain', color: '#6B8CAE', height: 'h-56',
     desc: 'The quiet, anxious anticipation that precedes emotional release — like the stillness before a storm.',
     image: '/images/IMG-20260625-WA0015.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 5, prompt: 'First Light', color: '#D2691E', height: 'h-72',
+    id: 4, prompt: 'First Light', color: '#D2691E', height: 'h-72',
     desc: 'A sunrise witnessed after a night of crisis — the radical hope of simply surviving until morning.',
     image: '/images/IMG-20260625-WA0017.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 6, prompt: 'Unfolding', color: '#F4A7B9', height: 'h-44',
+    id: 5, prompt: 'Unfolding', color: '#F4A7B9', height: 'h-44',
     desc: 'Growth rendered as a slow botanical unfolding — healing is not sudden; it is incremental and persistent.',
     image: '/images/IMG-20260625-WA0018.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 7, prompt: 'The Bridge I Cross Alone', color: '#8E44AD', height: 'h-64',
+    id: 6, prompt: 'The Bridge I Cross Alone', color: '#8E44AD', height: 'h-64',
     desc: 'A solitary crossing — representing the individual journey through mental health challenges before community support is found.',
     image: '/images/IMG-20260625-WA0019.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 8, prompt: 'Breaking the Mask', color: '#2D5016', height: 'h-52',
+    id: 7, prompt: 'Breaking the Mask', color: '#2D5016', height: 'h-52',
     desc: 'Confronting the cultural pressure to perform wellness — the courage required to acknowledge internal struggle.',
     image: '/images/IMG-20260625-WA0021.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 9, prompt: 'Tides of Grief', color: '#1A3A5C', height: 'h-68',
+    id: 8, prompt: 'Tides of Grief', color: '#1A3A5C', height: 'h-68',
     desc: 'Grief depicted as ocean waves — rhythmic, recurring, never fully resolved, but learned to move within.',
     image: '/images/IMG-20260625-WA0022.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 10, prompt: 'Found in the Field', color: '#6AAB3A', height: 'h-48',
+    id: 9, prompt: 'Found in the Field', color: '#6AAB3A', height: 'h-48',
     desc: 'Collective healing after collective trauma — the field as metaphor for community recovery and regrowth.',
     image: '/images/IMG-20260625-WA0023.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 11, prompt: 'The Spiral Returns', color: '#C9972A', height: 'h-60',
+    id: 10, prompt: 'The Spiral Returns', color: '#C9972A', height: 'h-60',
     desc: 'Mental health as spiral — you return to familiar struggles but at higher levels of understanding each time.',
     image: '/images/IMG-20260625-WA0024.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 12, prompt: 'Belonging Everywhere and Nowhere', color: '#A0522D', height: 'h-72',
+    id: 11, prompt: 'Belonging Everywhere and Nowhere', color: '#A0522D', height: 'h-72',
     desc: 'The complex identity experience of displacement — grief, resilience, and the search for rootedness across borders.',
     image: '/images/IMG-20260625-WA0025.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 13, prompt: 'Echoes in the Corridor', color: '#6B8CAE', height: 'h-56',
+    id: 12, prompt: 'Echoes in the Corridor', color: '#6B8CAE', height: 'h-56',
     desc: 'The lingering sounds of a school hallway where conversations about mental health are just beginning to find voice.',
     image: '/images/IMG-20260625-WA0026.jpg',
     country: 'Nairobi',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 14, prompt: 'Shared Table', color: '#8E44AD', height: 'h-64',
+    id: 13, prompt: 'Shared Table', color: '#8E44AD', height: 'h-64',
     desc: 'A gathering space where young people sit together, stories are exchanged, and isolation gives way to connection.',
     image: '/images/IMG-20260625-WA0027.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 15, prompt: 'Gardens of the Mind', color: '#4A7C3F', height: 'h-48',
+    id: 14, prompt: 'Gardens of the Mind', color: '#4A7C3F', height: 'h-48',
     desc: 'Cultivating mental well-being like a garden — patience, watering, weeding, and trusting the process of growth.',
     image: '/images/IMG-20260625-WA0028.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 16, prompt: 'Holding Space', color: '#D2691E', height: 'h-80',
+    id: 15, prompt: 'Holding Space', color: '#D2691E', height: 'h-80',
     desc: 'The quiet work of showing up for someone without trying to fix them — presence as the most powerful offering.',
     image: '/images/IMG-20260625-WA0029.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 17, prompt: 'Under the Same Sky', color: '#2D5016', height: 'h-56',
+    id: 16, prompt: 'Under the Same Sky', color: '#2D5016', height: 'h-56',
     desc: 'Despite different stories and struggles, youth across communities share the same fundamental need to be heard.',
     image: '/images/IMG-20260625-WA0030.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 18, prompt: 'Pages Unwritten', color: '#1A3A5C', height: 'h-72',
+    id: 17, prompt: 'Pages Unwritten', color: '#1A3A5C', height: 'h-72',
     desc: 'Reimagining what happens when a young person chooses to write a new chapter instead of repeating old patterns.',
     image: '/images/IMG-20260625-WA0031.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 19, prompt: 'Listening Circle', color: '#F4A7B9', height: 'h-44',
+    id: 18, prompt: 'Listening Circle', color: '#F4A7B9', height: 'h-44',
     desc: 'The ancient practice of sitting in circle — each voice matters, every story is honoured, silence is respected.',
     image: '/images/IMG-20260625-WA0032.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 20, prompt: 'Mountain Path', color: '#6AAB3A', height: 'h-52',
+    id: 19, prompt: 'Mountain Path', color: '#6AAB3A', height: 'h-52',
     desc: 'The winding road of recovery — not straight, not easy, but every step forward is a victory worth noting.',
     image: '/images/IMG-20260625-WA0033.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 21, prompt: 'Threads of Connection', color: '#C9972A', height: 'h-68',
+    id: 20, prompt: 'Threads of Connection', color: '#C9972A', height: 'h-68',
     desc: 'Weaving a safety net from shared experience — one conversation, one act of kindness, at a time.',
     image: '/images/IMG-20260625-WA0034.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 22, prompt: 'Quiet Strength', color: '#A0522D', height: 'h-64',
+    id: 21, prompt: 'Quiet Strength', color: '#A0522D', height: 'h-64',
     desc: 'The gentle power of knowing when to speak, when to listen, and when to simply sit beside someone.',
     image: '/images/IMG-20260625-WA0035.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 23, prompt: 'Ripples', color: '#6B8CAE', height: 'h-48',
+    id: 22, prompt: 'Ripples', color: '#6B8CAE', height: 'h-48',
     desc: 'One act of empathy creates waves that travel further than we can ever see — small choices, large impact.',
     image: '/images/IMG-20260625-WA0036.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 24, prompt: 'Home Within', color: '#8E44AD', height: 'h-56',
+    id: 23, prompt: 'Home Within', color: '#8E44AD', height: 'h-56',
     desc: 'Finding sanctuary inside oneself — building an inner foundation strong enough to weather any outer storm.',
     image: '/images/IMG-20260625-WA0037.jpg',
     country: 'Limuru',
     artist: 'Anonymous, Daraja Africa community'
   },
   {
-    id: 25, prompt: 'Tomorrow Begins Today', color: '#2D5016', height: 'h-72',
+    id: 24, prompt: 'Tomorrow Begins Today', color: '#2D5016', height: 'h-72',
     desc: 'The future is not a distant place — it is built in classrooms, corridors, and quiet conversations happening right now.',
     image: '/images/IMG-20260625-WA0038.jpg',
     country: 'Limuru',
