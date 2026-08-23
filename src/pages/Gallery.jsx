@@ -1,173 +1,174 @@
 import React, { useState } from 'react';
 
+// Captions describe what is actually visible in each photograph.
 const galleryItems = [
   {
     id: 1, prompt: 'The Weight of Silence', color: '#4A7C3F', height: 'h-48',
-    desc: 'Exploring what it feels like to carry unexpressed grief in a culture that valorises strength and endurance.',
+    desc: 'A team member photographs the Daraja Africa roll-up banner during an outdoor school visit.',
     image: '/images/IMG-20260625-WA0010.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 2, prompt: 'Roots That Hold', color: '#A0522D', height: 'h-80',
-    desc: 'Ubuntu philosophy rendered in texture — depicting interconnection as the source of personal resilience and collective healing.',
+    desc: 'A smiling team member in a Daraja Africa t-shirt poses beside the mission banner.',
     image: '/images/IMG-20260625-WA0011.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 3, prompt: 'Before the Rain', color: '#6B8CAE', height: 'h-56',
-    desc: 'The quiet, anxious anticipation that precedes emotional release — like the stillness before a storm.',
+    desc: 'A team member stands beside the mission-and-vision banner at an outdoor outreach event.',
     image: '/images/IMG-20260625-WA0015.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 4, prompt: 'First Light', color: '#D2691E', height: 'h-72',
-    desc: 'A sunrise witnessed after a night of crisis — the radical hope of simply surviving until morning.',
+    desc: 'A smiling team member points excitedly at the Daraja Africa banner outside a school building.',
     image: '/images/IMG-20260625-WA0017.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 5, prompt: 'Unfolding', color: '#F4A7B9', height: 'h-44',
-    desc: 'Growth rendered as a slow botanical unfolding — healing is not sudden; it is incremental and persistent.',
+    desc: 'Two students in school uniforms stand beside the Daraja Africa banner during a school visit.',
     image: '/images/IMG-20260625-WA0018.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 6, prompt: 'The Bridge I Cross Alone', color: '#8E44AD', height: 'h-64',
-    desc: 'A solitary crossing — representing the individual journey through mental health challenges before community support is found.',
+    desc: 'Three team members in matching Daraja Africa t-shirts stand arm-in-arm on a green lawn.',
     image: '/images/IMG-20260625-WA0019.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 7, prompt: 'Breaking the Mask', color: '#2D5016', height: 'h-52',
-    desc: 'Confronting the cultural pressure to perform wellness — the courage required to acknowledge internal struggle.',
+    desc: 'A smiling team member wearing sunglasses stands beside the mission-and-vision banner.',
     image: '/images/IMG-20260625-WA0021.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 8, prompt: 'Tides of Grief', color: '#1A3A5C', height: 'h-68',
-    desc: 'Grief depicted as ocean waves — rhythmic, recurring, never fully resolved, but learned to move within.',
+    desc: 'A young man gives a thumbs-up beside the Daraja Africa banner after a school session.',
     image: '/images/IMG-20260625-WA0022.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 9, prompt: 'Found in the Field', color: '#6AAB3A', height: 'h-48',
-    desc: 'Collective healing after collective trauma — the field as metaphor for community recovery and regrowth.',
+    desc: 'A team member stands beside the banner during an outdoor school visit.',
     image: '/images/IMG-20260625-WA0023.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 10, prompt: 'The Spiral Returns', color: '#C9972A', height: 'h-60',
-    desc: 'Mental health as spiral — you return to familiar struggles but at higher levels of understanding each time.',
+    desc: 'Five young people in matching Daraja Africa t-shirts stand together with arms linked.',
     image: '/images/IMG-20260625-WA0024.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 11, prompt: 'Belonging Everywhere and Nowhere', color: '#A0522D', height: 'h-72',
-    desc: 'The complex identity experience of displacement — grief, resilience, and the search for rootedness across borders.',
+    desc: 'Two young men in Daraja Africa t-shirts pose confidently in front of the mission banner.',
     image: '/images/IMG-20260625-WA0025.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 12, prompt: 'Echoes in the Corridor', color: '#6B8CAE', height: 'h-56',
-    desc: 'The lingering sounds of a school hallway where conversations about mental health are just beginning to find voice.',
+    desc: 'A team member strikes a celebratory pose beside the banner listing the program values.',
     image: '/images/IMG-20260625-WA0026.jpg',
     country: 'Nairobi',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 13, prompt: 'Shared Table', color: '#8E44AD', height: 'h-64',
-    desc: 'A gathering space where young people sit together, stories are exchanged, and isolation gives way to connection.',
+    desc: 'A team member poses in front of the Daraja Africa banner at an outdoor outreach event.',
     image: '/images/IMG-20260625-WA0027.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 14, prompt: 'Gardens of the Mind', color: '#4A7C3F', height: 'h-48',
-    desc: 'Cultivating mental well-being like a garden — patience, watering, weeding, and trusting the process of growth.',
+    desc: 'A team member stands beside the mission-and-vision banner on a school campus.',
     image: '/images/IMG-20260625-WA0028.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 15, prompt: 'Holding Space', color: '#D2691E', height: 'h-80',
-    desc: 'The quiet work of showing up for someone without trying to fix them — presence as the most powerful offering.',
+    desc: 'A smiling team member holds up a compact camera on a school lawn during an outreach day.',
     image: '/images/IMG-20260625-WA0029.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 16, prompt: 'Under the Same Sky', color: '#2D5016', height: 'h-56',
-    desc: 'Despite different stories and struggles, youth across communities share the same fundamental need to be heard.',
+    desc: 'A team member in sunglasses stands beside the Daraja Africa banner during a school visit.',
     image: '/images/IMG-20260625-WA0030.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 17, prompt: 'Pages Unwritten', color: '#1A3A5C', height: 'h-72',
-    desc: 'Reimagining what happens when a young person chooses to write a new chapter instead of repeating old patterns.',
+    desc: 'A team member gives an enthusiastic double thumbs-up in front of the Daraja Africa banner.',
     image: '/images/IMG-20260625-WA0031.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 18, prompt: 'Listening Circle', color: '#F4A7B9', height: 'h-44',
-    desc: 'The ancient practice of sitting in circle — each voice matters, every story is honoured, silence is respected.',
+    desc: 'A team member smiles on the lawn of a partner school during an outreach visit.',
     image: '/images/IMG-20260625-WA0032.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 19, prompt: 'Mountain Path', color: '#6AAB3A', height: 'h-52',
-    desc: 'The winding road of recovery — not straight, not easy, but every step forward is a victory worth noting.',
+    desc: 'A participant seated outdoors listens during a group session in a green, rural setting.',
     image: '/images/IMG-20260625-WA0033.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 20, prompt: 'Threads of Connection', color: '#C9972A', height: 'h-68',
-    desc: 'Weaving a safety net from shared experience — one conversation, one act of kindness, at a time.',
+    desc: 'A participant takes notes while seated on the grass during an outdoor session.',
     image: '/images/IMG-20260625-WA0034.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 21, prompt: 'Quiet Strength', color: '#A0522D', height: 'h-64',
-    desc: 'The gentle power of knowing when to speak, when to listen, and when to simply sit beside someone.',
+    desc: 'A team member addresses seated students beside the Daraja Africa banner under the trees.',
     image: '/images/IMG-20260625-WA0035.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 22, prompt: 'Ripples', color: '#6B8CAE', height: 'h-48',
-    desc: 'One act of empathy creates waves that travel further than we can ever see — small choices, large impact.',
+    desc: 'Facilitators and students chat together under the trees between outreach sessions.',
     image: '/images/IMG-20260625-WA0036.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 23, prompt: 'Home Within', color: '#8E44AD', height: 'h-56',
-    desc: 'Finding sanctuary inside oneself — building an inner foundation strong enough to weather any outer storm.',
+    desc: 'A team member speaks beside the banner during an outdoor outreach event.',
     image: '/images/IMG-20260625-WA0037.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   },
   {
     id: 24, prompt: 'Tomorrow Begins Today', color: '#2D5016', height: 'h-72',
-    desc: 'The future is not a distant place — it is built in classrooms, corridors, and quiet conversations happening right now.',
+    desc: 'Facilitators engage with students during an outdoor session at a partner school.',
     image: '/images/IMG-20260625-WA0038.jpg',
     country: 'Limuru',
-    artist: 'Anonymous, Daraja Africa community'
+    artist: 'Anonymous, Daraja Africa Network community'
   }
 ];
 
@@ -182,7 +183,7 @@ function GalleryCard({ item }) {
 
       <img
         src={item.image}
-        alt={item.prompt}
+        alt={item.desc}
         className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         loading="lazy"
       />
@@ -220,7 +221,7 @@ export default function Gallery() {
           <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold">Multimedia Wellness Narratives</span>
           <h1 className="font-display text-4xl md:text-6xl font-bold text-brand-charcoal mt-3 mb-5">Gallery</h1>
           <p className="text-brand-body text-lg leading-relaxed max-w-2xl mx-auto">
-            Recaps of the school visits, conversations, and mental health initiatives Daraja Africa has carried out across partner schools and communities.
+            Recaps of the school visits, conversations, and mental health initiatives Daraja Africa Network has carried out across partner schools and communities.
           </p>
         </div>
       </section>
