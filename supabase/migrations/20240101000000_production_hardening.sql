@@ -1,5 +1,5 @@
 -- production_hardening.sql
--- Daraja Africa — Database hardening for production launch
+-- Daraja Africa Network — Database hardening for production launch
 -- Applied via Supabase Dashboard > SQL Editor or Supabase CLI
 
 -- ===================================================

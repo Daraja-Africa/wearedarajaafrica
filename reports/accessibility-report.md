@@ -1,4 +1,4 @@
-# Accessibility Report — Daraja Africa Production Hardening
+# Accessibility Report — Daraja Africa Network Production Hardening
 
 ## Audit Scope
 

@@ -3,7 +3,7 @@ import { Shield, Heart, Globe, Users, Leaf, Compass } from 'lucide-react';
 
 const timeline = [
   { year: 'Origin', title: 'The Problem We Saw', body: 'In high school, students in distress often turn to their peers rather than teachers, yet peers are rarely equipped to offer adequate support.' },
-  { year: 'Founded', title: 'Daraja Africa Born', body: 'Founded by Iteyo Khaisia and Basma Issack to bridge this gap by combining professional mental health expertise with peer guidance.' },
+  { year: 'Founded', title: 'Daraja Africa Network Born', body: 'Founded by Iteyo Khaisia and Basma Issack to bridge this gap by combining professional mental health expertise with peer guidance.' },
   { year: 'Mission', title: 'Bridging the gap', body: 'Committed to bridging the mental health access gap and ensuring no student has to face their struggles alone.' },
   { year: 'Approach', title: 'Peer Education', body: 'We believe in the power of the untapped resource right in front of us: the youth themselves. By teaching teens how to be effective peer educators, we cultivate environments driven by empathy rather than judgment.' },
   { year: 'Programs', title: 'Campus Initiatives', body: 'We bring dedicated mental health camps, self-checks, and educational campaigns directly to campuses, proving every day that taking care of your mind builds a better tomorrow.' },
@@ -114,7 +114,7 @@ export default function About() {
           <div className="rounded-xl p-5 md:p-8 shadow-sm" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.08)', borderTop: '4px solid #4A7A3A' }}>
             <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-3">Our Mission</h2>
             <p className="font-body text-brand-body leading-relaxed">
-              Daraja Africa empowers young people through empathy-driven education, peer connection and professional guidance, bridging the mental health gap within high schools.
+              Daraja Africa Network empowers young people through empathy-driven education, peer connection and professional guidance, bridging the mental health gap within high schools.
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function About() {
           {/* Team */}
           <div className="pt-2">
             <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-5">Our Team</h2>
-            <p className="font-body text-brand-body leading-relaxed mb-6">Daraja Africa is driven by a passionate team of mental health professionals, advocates, and innovators:</p>
+            <p className="font-body text-brand-body leading-relaxed mb-6">Daraja Africa Network is driven by a passionate team of mental health professionals, advocates, and innovators:</p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {teamMembers.map((member, i) => (
                 <div key={i} className="rounded-2xl overflow-hidden shadow-sm" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(184,103,26,0.12)' }}>
@@ -175,7 +175,7 @@ export default function About() {
           {/* CTA */}
           <div className="bg-brand-charcoal text-brand-cream rounded-2xl p-6 md:p-8 text-center">
             <h3 className="font-display text-2xl font-bold mb-3">Let's bridge the gap together.</h3>
-            <p className="text-brand-cream/70 text-sm leading-relaxed mb-6">Reach out to bring Daraja Africa to your school or to support our ongoing initiatives.</p>
+            <p className="text-brand-cream/70 text-sm leading-relaxed mb-6">Reach out to bring Daraja Africa Network to your school or to support our ongoing initiatives.</p>
             <a href="mailto:info@darajaafrica.org" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-gold text-white font-semibold rounded-xl hover:bg-brand-gold-dark transition-colors text-sm">
               Get in Touch
             </a>

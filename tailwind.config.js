@@ -60,7 +60,7 @@ module.exports = {
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))'
         },
-        // Daraja Africa Brand Colors — PDF exact
+        // Daraja Africa Network Brand Colors — PDF exact
         brand: {
           cream: '#F5EFE4',            // page background
           'cream-light': '#E8DCC8',    // surface / UI panels

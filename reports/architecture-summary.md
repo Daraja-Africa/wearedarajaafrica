@@ -1,4 +1,4 @@
-# Architecture Summary — Daraja Africa Production Hardening
+# Architecture Summary — Daraja Africa Network Production Hardening
 
 ## Overview
 

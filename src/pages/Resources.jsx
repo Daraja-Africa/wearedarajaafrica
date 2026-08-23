@@ -208,9 +208,9 @@ export default function Resources() {
           {/* Quick FAQ */}
           <div className="mt-10 text-left max-w-2xl mx-auto space-y-4">
             {[
-              { q: 'Is Daraja Africa free?', a: null, isFirst: true },
+              { q: 'Is Daraja Africa Network free?', a: null, isFirst: true },
               { q: 'What happens in a peer circle?', a: 'A trained peer facilitator guides a small, safe group session where participants share experiences, listen without judgment, and support each other. Everything shared stays within the group.' },
-              { q: 'How can my school invite Daraja Africa?', a: 'Reach out via the Get Involved page to apply as a partner school. We\'ll connect with your administration to schedule outreach sessions and health pop-up days.' },
+              { q: 'How can my school invite Daraja Africa Network?', a: 'Reach out via the Get Involved page to apply as a partner school. We\'ll connect with your administration to schedule outreach sessions and health pop-up days.' },
               { q: 'Are these resources free?', a: 'Yes — all resources on this page are free and publicly accessible. We believe mental health support should not be gated by cost.' },
             ].map((faq, i) => (
               <details key={i} className="rounded-xl p-5 cursor-pointer" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(184,103,26,0.15)' }}>
@@ -219,7 +219,7 @@ export default function Resources() {
                 </summary>
                 {faq.isFirst ? (
                   <p className="mt-3 text-sm text-brand-body leading-relaxed">
-                    Yes. Daraja Africa provides its services free of charge. For guidance and sign-up information, visit the{' '}
+                    Yes. Daraja Africa Network provides its services free of charge. For guidance and sign-up information, visit the{' '}
                     <a href="/get-involved" className="text-brand-gold hover:underline font-medium">Get Involved page</a>{' '}
                     for{' '}
                     <a href="/get-involved" className="text-brand-gold hover:underline font-medium">volunteer opportunities</a>{' '}

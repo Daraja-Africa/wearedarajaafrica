@@ -38,14 +38,14 @@ export default function Footer() {
           <div className="sm:col-span-2 lg:col-span-1">
             <img
               src="/images/daraja-logo-transparent.png"
-              alt="Daraja Africa"
+              alt="Daraja Africa Network"
               className="h-16 sm:h-20 w-auto object-contain mb-4 mix-blend-screen"
             />
             <p className="text-xs leading-relaxed mb-3" style={{ color: '#5A5248' }}>
-              © {new Date().getFullYear()} Daraja Africa. All rights reserved.
+              © {new Date().getFullYear()} Daraja Africa Network. All rights reserved.
             </p>
             <p className="text-xs leading-relaxed" style={{ color: '#5A5248' }}>
-              Daraja Africa is an auxiliary emotional reflection framework, not a licensed clinical treatment program. In emergencies, please contact a qualified mental health professional.
+              Daraja Africa Network is an auxiliary emotional reflection framework, not a licensed clinical treatment program. In emergencies, please contact a qualified mental health professional.
             </p>
           </div>
 

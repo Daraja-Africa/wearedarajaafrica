@@ -85,7 +85,7 @@ const olderAnnouncements = [
   typeColor: 'bg-brand-rust/10 text-brand-rust',
   updates: [
   'Living Archives community stream launched — real-time anonymous emotional pulse',
-  'Full platform redesign with Daraja Africa logo color palette integration',
+  'Full platform redesign with Daraja Africa Network logo color palette integration',
   'Gallery section launched featuring anonymous African wellness art submissions',
   'Get Involved sponsorship module deployed with full cost transparency']
 
@@ -191,7 +191,7 @@ export default function Announcements() {
       <section className="py-14 px-4 border-t border-brand-gold/15">
         <div className="max-w-lg mx-auto text-center">
           <h2 className="font-display text-2xl font-bold text-brand-charcoal mb-2">Stay connected with our journey.</h2>
-          <p className="text-brand-body text-sm mb-6">Get event recaps, upcoming peer circle dates, and Daraja Africa news — no spam, ever.</p>
+          <p className="text-brand-body text-sm mb-6">Get event recaps, upcoming peer circle dates, and Daraja Africa Network news — no spam, ever.</p>
           <NewsletterSignup />
         </div>
       </section>
