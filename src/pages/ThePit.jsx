@@ -10,9 +10,12 @@ import { submitPitEntry, fetchWitnessFeed } from "@/api/moderation";
 import { useRateLimit, useSubmissionCooldown } from "@/hooks/useModeration";
 
 // ─── KEYWORD FILTER ─────────────────────────────────────────────────────────
+// Whole-word matching so substrings like "soldier" don't trip on "die".
+// This is UX guidance only — the Edge Function is the real enforcement point.
 const BAD_WORDS = ["kill", "murder", "hate", "die", "suicide", "slur"];
+const BAD_WORDS_PATTERN = new RegExp(`\\b(?:${BAD_WORDS.join("|")})\\b`, "i");
 function isInappropriate(text) {
-  return BAD_WORDS.some(w => text.toLowerCase().includes(w));
+  return BAD_WORDS_PATTERN.test(text);
 }
 
 export default function ThePit() {

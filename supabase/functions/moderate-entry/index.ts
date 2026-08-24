@@ -1,11 +1,27 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-};
+// Optional comma-separated allow-list (e.g. "https://wearedarajaafrica.org").
+// When unset, falls back to "*" so local dev and existing deploys keep working.
+const allowedOrigins = (Deno.env.get("ALLOWED_ORIGINS") ?? "")
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin");
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+  };
+  if (origin && allowedOrigins.includes(origin)) {
+    headers["Access-Control-Allow-Origin"] = origin;
+    headers["Vary"] = "Origin";
+  } else if (allowedOrigins.length === 0) {
+    headers["Access-Control-Allow-Origin"] = "*";
+  }
+  return headers;
+}
 
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
 const RATE_LIMIT_MAX = 10;
@@ -19,8 +35,9 @@ const BLOCKED_PATTERNS = [
 ];
 
 serve(async (req) => {
+  const cors = corsHeaders(req);
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return new Response("ok", { headers: cors });
   }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? Deno.env.get("SUPABASE_PROJECT_URL") ?? "";
@@ -40,29 +57,37 @@ serve(async (req) => {
       client_ip,
     } = body;
 
-    const clientIp = client_ip || req.headers.get("x-forwarded-for") || "unknown";
+    // Trust the edge proxy's x-forwarded-for (leftmost entry) over any
+    // client-supplied value; the body field is only a last-resort fallback.
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    const clientIp =
+      (forwardedFor ? forwardedFor.split(",")[0].trim() : "") ||
+      client_ip ||
+      "unknown";
+    let rateLimitDegraded = false;
     const isPitEntry = !!text;
     const now = new Date().toISOString();
 
     if (isPitEntry && (!text || text.trim().length === 0)) {
       return new Response(
         JSON.stringify({ error: "Entry text is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...cors, "Content-Type": "application/json" } }
       );
     }
 
     if (!isPitEntry && !support_contact) {
       return new Response(
         JSON.stringify({ error: "Contact information is required" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 400, headers: { ...cors, "Content-Type": "application/json" } }
       );
     }
 
     const rateLimitResult = await checkRateLimit(supabase, clientIp);
+    rateLimitDegraded = !!rateLimitResult.degraded;
     if (!rateLimitResult.allowed) {
       return new Response(
         JSON.stringify({ error: "Too many submissions. Please wait a few minutes before trying again." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 429, headers: { ...cors, "Content-Type": "application/json" } }
       );
     }
 
@@ -89,7 +114,7 @@ serve(async (req) => {
           });
           return new Response(
             JSON.stringify({ error: "You already submitted this recently. Please wait a few minutes." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 429, headers: { ...cors, "Content-Type": "application/json" } }
           );
         }
       }
@@ -108,7 +133,7 @@ serve(async (req) => {
               error: "This content cannot be shared in the pit. Your feelings are valid, but for everyone's safety this must go to the void.",
               routed_to_void: true,
             }),
-            { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            { status: 422, headers: { ...cors, "Content-Type": "application/json" } }
           );
         }
       }
@@ -136,7 +161,7 @@ serve(async (req) => {
         console.error("Pit insert error:", error);
         return new Response(
           JSON.stringify({ error: "Failed to save entry" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
         );
       }
       result = data;
@@ -159,7 +184,7 @@ serve(async (req) => {
         console.error("Support insert error:", error);
         return new Response(
           JSON.stringify({ error: "Failed to save support request" }),
-          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
         );
       }
       result = data;
@@ -173,15 +198,24 @@ serve(async (req) => {
       metadata: { destination: destination || "unknown" },
     });
 
+    const successHeaders: Record<string, string> = {
+      ...cors,
+      "Content-Type": "application/json",
+    };
+    // Fail-open rate limiting is intentional (a DB hiccup must not lock out
+    // help-seeking users), but degradation should be observable.
+    if (rateLimitDegraded) {
+      successHeaders["x-rate-limit-degraded"] = "true";
+    }
     return new Response(
       JSON.stringify({ success: true, data: result }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { headers: successHeaders }
     );
   } catch (err) {
     console.error("Moderation error:", err);
     return new Response(
       JSON.stringify({ error: "Internal server error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 500, headers: { ...cors, "Content-Type": "application/json" } }
     );
   }
 });
@@ -197,13 +231,14 @@ async function checkRateLimit(supabase, clientIp) {
 
     if (error) {
       console.error("Rate limit check error:", error);
-      return { allowed: true };
+      // Fail-open on purpose: duplicate + content checks still run.
+      return { allowed: true, degraded: true };
     }
 
-    return { allowed: (count || 0) < RATE_LIMIT_MAX, remaining: RATE_LIMIT_MAX - (count || 0) };
+    return { allowed: (count || 0) < RATE_LIMIT_MAX, remaining: RATE_LIMIT_MAX - (count || 0), degraded: false };
   } catch (e) {
     console.error("Rate limit exception:", e);
-    return { allowed: true };
+    return { allowed: true, degraded: true };
   }
 }
 
