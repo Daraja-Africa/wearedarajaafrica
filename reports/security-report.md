@@ -1,4 +1,4 @@
-# Security Report — Daraja Africa Production Hardening
+# Security Report — Daraja Africa Network Production Hardening
 
 ## Executive Summary
 

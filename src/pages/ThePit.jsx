@@ -157,7 +157,7 @@ export default function ThePit() {
           <ArrowLeft className="w-4 h-4" />
           <img
             src="/images/daraja-logo-transparent.png"
-            alt="Daraja Africa"
+            alt="Daraja Africa Network"
             className="h-7 w-auto object-contain"
             style={{ filter: 'brightness(0) invert(1)' }}
           />

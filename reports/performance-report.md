@@ -1,4 +1,4 @@
-# Performance Report — Daraja Africa Production Hardening
+# Performance Report — Daraja Africa Network Production Hardening
 
 ## Bundle Analysis (Post-Hardening)
 

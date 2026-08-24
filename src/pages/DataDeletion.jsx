@@ -7,7 +7,7 @@ const sections = [
     icon: <FileText className="w-5 h-5" />,
     title: 'What Data Can Be Deleted',
     content: [
-      'Upon request, Daraja Africa will delete the following categories of personal data: contact form submissions (name, email, message); volunteer application information; partner or school enquiry records; and any personally identifiable information associated with your email address.',
+      'Upon request, Daraja Africa Network will delete the following categories of personal data: contact form submissions (name, email, message); volunteer application information; partner or school enquiry records; and any personally identifiable information associated with your email address.',
       'Anonymous entries submitted to The Pit are stored without any personal identifier. Because they cannot be linked to an individual, they cannot be specifically identified or deleted on request — however, all Pit entries are periodically reviewed and older entries may be removed as part of routine data hygiene.',
     ],
   },
@@ -23,7 +23,7 @@ const sections = [
     icon: <Clock className="w-5 h-5" />,
     title: 'Response Timelines',
     content: [
-      'Daraja Africa aims to process all data deletion requests within 30 calendar days of receipt. For complex requests involving multiple data sources, we may require up to 60 days and will notify you if an extension is needed.',
+      'Daraja Africa Network aims to process all data deletion requests within 30 calendar days of receipt. For complex requests involving multiple data sources, we may require up to 60 days and will notify you if an extension is needed.',
       'Once deletion is confirmed, we will send you a written confirmation to the email address you used to submit the request.',
     ],
   },
@@ -39,7 +39,7 @@ const sections = [
     icon: <AlertCircle className="w-5 h-5" />,
     title: 'Data We May Be Required to Retain',
     content: [
-      'In limited circumstances, Daraja Africa may be legally or operationally required to retain certain information even after a deletion request. This includes: records required for compliance with applicable law or regulatory obligations; information necessary to resolve outstanding disputes or complaints; and records of organizational partnerships that have legal or contractual significance.',
+      'In limited circumstances, Daraja Africa Network may be legally or operationally required to retain certain information even after a deletion request. This includes: records required for compliance with applicable law or regulatory obligations; information necessary to resolve outstanding disputes or complaints; and records of organizational partnerships that have legal or contractual significance.',
       'Where we must retain data for these reasons, we will inform you and limit use of that data strictly to the purpose requiring retention.',
     ],
   },
@@ -55,7 +55,7 @@ const sections = [
     icon: <Trash2 className="w-5 h-5" />,
     title: 'Data Retention Periods',
     content: [
-      'In the absence of a deletion request, Daraja Africa retains personal data only as long as necessary for the purpose for which it was collected. Contact form submissions are retained for up to 12 months. Volunteer application records are retained for up to 24 months from the date of application.',
+      'In the absence of a deletion request, Daraja Africa Network retains personal data only as long as necessary for the purpose for which it was collected. Contact form submissions are retained for up to 12 months. Volunteer application records are retained for up to 24 months from the date of application.',
       'Anonymous Pit entries have no defined expiration, as they contain no personal information. However, the platform reserves the right to archive or remove entries as part of ongoing content management.',
     ],
   },
@@ -63,7 +63,7 @@ const sections = [
     icon: <Shield className="w-5 h-5" />,
     title: 'Our Commitment to Responsible Data Stewardship',
     content: [
-      'Daraja Africa is a youth-focused mental health organization and we take the privacy of those we serve seriously — especially students, young people, and vulnerable communities. We collect only what we need, retain it only as long as necessary, and handle all requests with transparency and care.',
+      'Daraja Africa Network is a youth-focused mental health organization and we take the privacy of those we serve seriously — especially students, young people, and vulnerable communities. We collect only what we need, retain it only as long as necessary, and handle all requests with transparency and care.',
       'This policy is reviewed periodically and updated to reflect changes in our services or applicable legal standards. For questions about this policy or to submit a request, please contact us using the details below.',
     ],
   },
@@ -77,7 +77,7 @@ export default function DataDeletion() {
           <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold">Trust & Safety</span>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-brand-charcoal mt-3 mb-5">Data Deletion Policy</h1>
           <p className="text-brand-body text-lg leading-relaxed max-w-2xl mx-auto">
-            You have the right to request removal of your personal information. This policy explains how Daraja Africa handles data deletion requests, timelines, and the information we are required to retain.
+            You have the right to request removal of your personal information. This policy explains how Daraja Africa Network handles data deletion requests, timelines, and the information we are required to retain.
           </p>
           <p className="text-sm text-brand-body/60 mt-4">Effective Date: June 2026</p>
         </div>
@@ -106,7 +106,7 @@ export default function DataDeletion() {
               <h2 className="font-display text-xl font-bold">Submit a Deletion Request</h2>
             </div>
             <p className="text-brand-cream/70 text-sm leading-relaxed mb-4">
-              To request deletion of your data, contact the Daraja Africa team with your name, email, and a description of the information you would like removed.
+              To request deletion of your data, contact the Daraja Africa Network team with your name, email, and a description of the information you would like removed.
             </p>
             <div className="space-y-2 text-sm">
               <p><span className="text-brand-cream/50">Email:</span> <a href="mailto:info@darajaafrica.org" className="text-brand-gold hover:underline">info@darajaafrica.org</a></p>

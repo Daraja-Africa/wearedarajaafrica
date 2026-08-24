@@ -42,7 +42,7 @@ export default function Navbar() {
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img
               src="/images/daraja-logo-transparent.png"
-              alt="Daraja Africa"
+              alt="Daraja Africa Network"
               className="h-10 w-auto object-contain mix-blend-multiply"
             />
             <span className="font-display font-bold text-sm tracking-wide uppercase">

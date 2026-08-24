@@ -65,9 +65,9 @@ export default function Programs() {
           <div className="mt-8 rounded-2xl p-8 shadow-sm" style={{ backgroundColor: '#1C1A14', borderTop: '4px solid #B8671A' }}>
             <div className="max-w-3xl mx-auto">
               <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: '#B8671A' }}>Our Curriculum</span>
-              <h2 className="font-display text-2xl md:text-3xl font-bold mt-2 mb-4 text-white">Designed by Daraja Africa. Built for Schools.</h2>
+              <h2 className="font-display text-2xl md:text-3xl font-bold mt-2 mb-4 text-white">Designed by Daraja Africa Network. Built for Schools.</h2>
               <p className="text-white/70 text-sm leading-relaxed mb-5">
-                Daraja Africa developed a six-week curriculum specifically designed to build capacity for addressing mental health challenges in high schools. Supported by ongoing school check-ins and a comprehensive educator resource pack, this program gives teachers and students the language, tools, and confidence to navigate mental health together.
+                Daraja Africa Network developed a six-week curriculum specifically designed to build capacity for addressing mental health challenges in high schools. Supported by ongoing school check-ins and a comprehensive educator resource pack, this program gives teachers and students the language, tools, and confidence to navigate mental health together.
               </p>
               <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 {[
@@ -76,7 +76,7 @@ export default function Programs() {
                   'Age-appropriate emotional literacy modules',
                   'Stigma reduction and awareness content',
                   'Ongoing school check-in support',
-                  'Built and implemented by Daraja Africa',
+                  'Built and implemented by Daraja Africa Network',
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-2 text-white/70">
                     <span style={{ color: '#F4A8B8' }}>✓</span> {item}

@@ -11,7 +11,7 @@ export default function Home() {
       <div className="flex flex-col items-center pt-12 pb-6 px-4">
         <img
           src="/images/daraja-logo-transparent.png"
-          alt="Daraja Africa"
+          alt="Daraja Africa Network"
           className="h-52 sm:h-72 md:h-96 w-auto object-contain mix-blend-multiply" />
         
         <p className="text-sm md:text-base font-medium tracking-widest text-brand-body/70 mt-3 text-center">
@@ -38,10 +38,10 @@ export default function Home() {
           <div className="text-center mb-10">
             <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-charcoal mb-4">Who We Are</h2>
             <p className="text-brand-body text-lg leading-relaxed max-w-3xl mx-auto">
-              Daraja Africa is a mental health initiative committed to changing the narrative around youth mental well-being. We understand that when high school students face challenges, they instinctively turn to their peers. We are here to bridge the mental health gap within high schools. We empower young people through empathy-driven education, peer connection and professional guidance.
+              Daraja Africa Network is a mental health initiative committed to changing the narrative around youth mental well-being. We understand that when high school students face challenges, they instinctively turn to their peers. We are here to bridge the mental health gap within high schools. We empower young people through empathy-driven education, peer connection and professional guidance.
             </p>
             <p className="text-brand-body text-lg leading-relaxed max-w-3xl mx-auto mt-4">
-              That is why Daraja Africa developed a six-week curriculum, supported by school check-ins and a comprehensive educator resource pack, to build capacity for addressing mental health challenges.
+              That is why Daraja Africa Network developed a six-week curriculum, supported by school check-ins and a comprehensive educator resource pack, to build capacity for addressing mental health challenges.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -63,7 +63,7 @@ export default function Home() {
       <section className="py-16 md:py-24 px-4 border-t border-brand-gold/10" style={{ backgroundColor: '#E8DCC8' }}>
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10 md:mb-14">
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-charcoal mb-4">Why Support Daraja Africa?</h2>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-charcoal mb-4">Why Support Daraja Africa Network?</h2>
             <p className="text-brand-body text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
               Mental health matters, yet it remains an overlooked and often shunned topic in many Sub-Saharan schools. By supporting us, you are directly investing in a mentally healthy generation of African students empowered to rise with hope, compassion, and resilience.
             </p>

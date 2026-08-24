@@ -7,7 +7,7 @@ const sections = [
     icon: <Eye className="w-5 h-5" />,
     title: 'What Information We Collect',
     content: [
-      'When you use Daraja Africa\'s platform or services, we may collect limited information including: your name or alias (if voluntarily provided), email address (if you sign up or contact us), messages submitted via contact or support forms, and anonymous emotional entries submitted to The Pit (no account required).',
+      'When you use Daraja Africa Network\'s platform or services, we may collect limited information including: your name or alias (if voluntarily provided), email address (if you sign up or contact us), messages submitted via contact or support forms, and anonymous emotional entries submitted to The Pit (no account required).',
       'We do not require you to create an account to access most of the platform. Anonymous entries to The Pit are stored without any identifying information attached.',
     ],
   },
@@ -31,7 +31,7 @@ const sections = [
     icon: <Lock className="w-5 h-5" />,
     title: 'How We Store and Protect Your Data',
     content: [
-      'Daraja Africa uses industry-standard security practices to protect your information. Data is stored on secure servers with access controls limiting who can view submitted information. We regularly review our data handling practices to ensure they remain appropriate and up to date.',
+      'Daraja Africa Network uses industry-standard security practices to protect your information. Data is stored on secure servers with access controls limiting who can view submitted information. We regularly review our data handling practices to ensure they remain appropriate and up to date.',
       'While we take reasonable precautions, no internet transmission is completely secure. We encourage you not to share sensitive clinical or medical information through our platform.',
     ],
   },
@@ -39,7 +39,7 @@ const sections = [
     icon: <Users className="w-5 h-5" />,
     title: 'Protection of Minors and Youth Data',
     content: [
-      'Daraja Africa primarily serves high school students and young people. We are committed to protecting the privacy of minors. We do not knowingly collect personally identifiable information from children under 13 without parental consent.',
+      'Daraja Africa Network primarily serves high school students and young people. We are committed to protecting the privacy of minors. We do not knowingly collect personally identifiable information from children under 13 without parental consent.',
       'Anonymous entries to The Pit are designed to be completely untraceable to any individual, including minors. School partnerships are governed by institutional agreements that include data protection provisions appropriate to the age group being served.',
     ],
   },
@@ -47,7 +47,7 @@ const sections = [
     icon: <RefreshCw className="w-5 h-5" />,
     title: 'Third-Party Services',
     content: [
-      'Daraja Africa uses a limited number of trusted third-party services to operate its platform, including hosting and form services. These services are selected based on their compliance with data protection standards.',
+      'Daraja Africa Network uses a limited number of trusted third-party services to operate its platform, including hosting and form services. These services are selected based on their compliance with data protection standards.',
       'We do not integrate advertising networks, social tracking pixels, or data brokers into our platform. External links (such as mental health resources) are provided for your convenience — please review the privacy policies of those external websites independently.',
     ],
   },
@@ -55,7 +55,7 @@ const sections = [
     icon: <Eye className="w-5 h-5" />,
     title: 'Cookies and Analytics',
     content: [
-      'Daraja Africa may use minimal, privacy-respecting analytics to understand how the platform is being used (e.g. which pages are visited most frequently). This data is aggregated and does not identify individual users.',
+      'Daraja Africa Network may use minimal, privacy-respecting analytics to understand how the platform is being used (e.g. which pages are visited most frequently). This data is aggregated and does not identify individual users.',
       'We do not use tracking cookies for advertising purposes. You may disable cookies through your browser settings without losing access to core platform features.',
     ],
   },
@@ -72,7 +72,7 @@ const sections = [
     title: 'Changes to This Privacy Charter',
     content: [
       'We may update this Privacy Charter from time to time to reflect changes in our services or legal obligations. Any material changes will be noted on this page with an updated effective date. We encourage you to review this page periodically.',
-      'Continued use of the Daraja Africa platform after changes are posted constitutes acceptance of the revised Charter.',
+      'Continued use of the Daraja Africa Network platform after changes are posted constitutes acceptance of the revised Charter.',
     ],
   },
 ];
@@ -85,7 +85,7 @@ export default function PrivacyCharter() {
           <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold">Trust & Safety</span>
           <h1 className="font-display text-4xl md:text-5xl font-bold text-brand-charcoal mt-3 mb-5">Privacy Charter</h1>
           <p className="text-brand-body text-lg leading-relaxed max-w-2xl mx-auto">
-            Daraja Africa is committed to protecting your privacy and handling your information with transparency, care, and respect — especially when working with young people and vulnerable communities.
+            Daraja Africa Network is committed to protecting your privacy and handling your information with transparency, care, and respect — especially when working with young people and vulnerable communities.
           </p>
           <p className="text-sm text-brand-body/60 mt-4">Effective Date: June 2026</p>
         </div>
@@ -114,7 +114,7 @@ export default function PrivacyCharter() {
               <h2 className="font-display text-xl font-bold">Contact Us About Privacy</h2>
             </div>
             <p className="text-brand-cream/70 text-sm leading-relaxed mb-4">
-              For any privacy-related questions, data access requests, or concerns, please reach out to the Daraja Africa team directly.
+              For any privacy-related questions, data access requests, or concerns, please reach out to the Daraja Africa Network team directly.
             </p>
             <div className="space-y-2 text-sm">
               <p><span className="text-brand-cream/50">Email:</span> <a href="mailto:info@darajaafrica.org" className="text-brand-gold hover:underline">info@darajaafrica.org</a></p>

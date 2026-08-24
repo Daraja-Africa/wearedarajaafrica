@@ -454,7 +454,7 @@ export default function GetHelp() {
         </div>
 
         <p className="text-xs text-center mt-8 text-brand-body/50">
-          Daraja Africa is an auxiliary reflection platform. The above are
+          Daraja Africa Network is an auxiliary reflection platform. The above are
           independent services. We are not affiliated with any listed
           organisation.
         </p>

@@ -1,10 +1,10 @@
-# We Are Daraja Africa
+# We Are Daraja Africa Network
 
 A React application for anonymous emotional expression and youth mental health support, built with Supabase as the backend.
 
 ## Project Overview
 
-Daraja Africa is a mental health initiative that bridges the youth mental health gap through empathy-driven education, peer connection, and professional guidance. This application provides:
+Daraja Africa Network is a mental health initiative that bridges the youth mental health gap through empathy-driven education, peer connection, and professional guidance. This application provides:
 
 - **The Pit** — Anonymous cathartic sharing with a moderated community feed
 - **The Void** — Private, unsaved emotional releases with zero audience

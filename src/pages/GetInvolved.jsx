@@ -19,7 +19,7 @@ export default function GetInvolved() {
 
           {/* Volunteer Card */}
           <div className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
-            <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>Volunteer with Daraja Africa</h2>
+            <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>Volunteer with Daraja Africa Network</h2>
             <p className="text-brand-body/70 text-sm leading-relaxed mb-6">
               Join our network of community advocates and peer counselors working to normalise mental health conversations across Sub-Saharan Africa.
             </p>
@@ -40,7 +40,7 @@ export default function GetInvolved() {
           <div className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
             <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>School &amp; Organization Partnerships</h2>
             <p className="text-brand-body/70 text-sm leading-relaxed mb-6">
-              Partner with Daraja Africa to support school mental health programs and outreach initiatives.
+              Partner with Daraja Africa Network to support school mental health programs and outreach initiatives.
             </p>
             <a
               href="https://wa.me/254748047581?text=Hello%20Daraja%20Africa%2C%20I%27m%20interested%20in%20a%20school%20partnership."
@@ -59,7 +59,7 @@ export default function GetInvolved() {
           <div id="get-in-touch" className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
             <h2 className="font-display text-2xl font-bold mb-2" style={{ color: '#4A7A3A' }}>Get in Touch</h2>
             <p className="text-brand-body/80 text-sm mb-6 leading-relaxed">
-              Reach out directly to connect with the Daraja Africa team — whether you're a prospective volunteer, partner, or supporter.
+              Reach out directly to connect with the Daraja Africa Network team — whether you're a prospective volunteer, partner, or supporter.
             </p>
             <div className="flex flex-col gap-5">
 <a href="tel:+254748047581" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
