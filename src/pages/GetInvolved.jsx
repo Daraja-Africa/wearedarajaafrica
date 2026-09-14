@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Phone, Instagram, Video } from 'lucide-react';
+import DonationSection from '@/components/donations/DonationSection';
 
 export default function GetInvolved() {
   return (
@@ -35,6 +36,9 @@ export default function GetInvolved() {
               Apply as a Volunteer <ArrowRight className="w-4 h-4" />
             </a>
           </div>
+
+          {/* Donations — placeholder boilerplate (M-Pesa + PayPal, no live payments) */}
+          <DonationSection />
 
           {/* School Partnerships Card */}
           <div className="rounded-2xl p-6 md:p-10 transition-shadow duration-300 hover:shadow-lg" style={{ backgroundColor: '#FDF8F0', border: '1px solid rgba(74,122,58,0.2)', boxShadow: '0 1px 3px rgba(74,122,58,0.08)' }}>
