@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Phone, Instagram, Video } from 'lucide-react';
+import { ArrowRight, Phone, Instagram, Video, Facebook } from 'lucide-react';
 import DonationSection from '@/components/donations/DonationSection';
 
 export default function GetInvolved() {
@@ -25,7 +25,7 @@ export default function GetInvolved() {
               Join our network of community advocates and peer counselors working to normalise mental health conversations across Sub-Saharan Africa.
             </p>
             <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLScVQSuS5AqRXBe9ITIiCo5AtU9ACG0i3-8T35i2RPkG5q3wLw/viewform?usp=publish-editor"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSdNyVrOCcWGlC-ApL13-Y5MqKrv0G93YCXyPOU5boKT1SQpZw/viewform?usp=sharing&ouid=106488136195233725857"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-xl transition-all"
@@ -75,22 +75,31 @@ export default function GetInvolved() {
                   <p className="text-sm font-semibold">+254 748 047 581</p>
                 </div>
               </a>
-<a href="https://instagram.com/daraja_africa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
+<a href="https://instagram.com/daraja_africa_network" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
                  <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#E8DCC8' }}>
                    <Instagram className="w-5 h-5" style={{ color: '#4A7A3A' }} />
                  </div>
                 <div>
                   <p className="text-xs text-brand-body/60 uppercase tracking-wide font-semibold">Instagram</p>
-                  <p className="text-sm font-semibold">@daraja_africa</p>
+                  <p className="text-sm font-semibold">@daraja_africa_network</p>
                 </div>
               </a>
-<a href="https://tiktok.com/@daraja_africa" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
+<a href="https://tiktok.com/@daraja_africa_network" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
                  <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#E8DCC8' }}>
                    <Video className="w-5 h-5" style={{ color: '#4A7A3A' }} />
                  </div>
                 <div>
                   <p className="text-xs text-brand-body/60 uppercase tracking-wide font-semibold">TikTok</p>
-                  <p className="text-sm font-semibold">@daraja_africa</p>
+                  <p className="text-sm font-semibold">@daraja_africa_network</p>
+                </div>
+              </a>
+<a href="https://facebook.com/daraja_africa_network" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-brand-charcoal hover:text-brand-forest transition-colors">
+                 <div className="p-2.5 rounded-lg shrink-0" style={{ backgroundColor: '#E8DCC8' }}>
+                   <Facebook className="w-5 h-5" style={{ color: '#4A7A3A' }} />
+                 </div>
+                <div>
+                  <p className="text-xs text-brand-body/60 uppercase tracking-wide font-semibold">Facebook</p>
+                  <p className="text-sm font-semibold">daraja_africa_network</p>
                 </div>
               </a>
             </div>
