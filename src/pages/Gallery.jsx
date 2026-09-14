@@ -1,7 +1,37 @@
 import React, { useState } from 'react';
 
-// Captions describe what is actually visible in each photograph.
-const galleryItems = [
+/* ─── GALLERY DATA SOURCE & ORDERING (read before editing) ──────────────
+ * Items are ordered NEWEST-FIRST. Each asset's filename encodes its capture
+ * date (e.g. "IMG-20260824-WA0010.jpg" → 2026-08-24) — that is the date the
+ * order below is derived from. When this feed moves to Supabase
+ * (gallery_items table), keep the order server-side so it is consistent
+ * regardless of pagination:
+ *
+ *   1. Each gallery row needs a `captured_at timestamptz NOT NULL` column
+ *      (equivalently `created_at`/`uploaded_at` — pick one convention and
+ *      backfill it from the filename dates used below).
+ *   2. Fetch with a QUERY-LEVEL order-by, not a client-side sort:
+ *        supabase.from('gallery_items')
+ *          .select('*')
+ *          .order('captured_at', { ascending: false })
+ *   3. De-duplication: enforce uniqueness on the ASSET, not the title —
+ *      add a UNIQUE index on a deterministic content fingerprint, e.g.
+ *        CREATE UNIQUE INDEX gallery_items_storage_key_key
+ *          ON gallery_items (storage_path);
+ *      plus an upload-time check hashing the file bytes (SHA-256) so the
+ *      same photo uploaded twice with different titles is rejected.
+ *      (Two different photos can legitimately share a title, so a title
+ *      match would be the WRONG de-dupe key.)
+ *   4. If a one-time cleanup of existing DB duplicates is ever needed, do
+ *      it as a logged migration: SELECT the dupes INTO a backup table
+ *      (e.g. gallery_items_removed_backup) before DELETE, never bare DELETE.
+ *
+ * NOTE (flagged per task spec): the current Supabase schema has NO
+ * gallery_items table — there is no `created_at`/`uploaded_at` field to
+ * order by yet. This migration must be created before any Supabase-backed
+ * gallery ships; until then the static array below is the source of truth.
+ * ───────────────────────────────────────────────────────────────────── */
+const rawGalleryItems = [
   {
     id: 1, prompt: 'The Weight of Silence', color: '#4A7C3F', height: 'h-48',
     desc: 'A team member photographs the Daraja Africa roll-up banner during an outdoor school visit.',
@@ -423,6 +453,48 @@ const galleryItems = [
     artist: 'Anonymous, Daraja Africa Network community'
   }
 ];
+
+/* ─── Order + de-dupe pipeline (static-data stand-in for the SQL in the
+ * migration note above) ─────────────────────────────────────────────── */
+
+// Derive the capture/upload date from the WhatsApp filename convention
+// ("IMG-20260824-WA0010.jpg" → "2026-08-24"). Non-WA filenames (logos,
+// screenshots) fall back to the repo import date so they always sort last.
+function captureDateFromFilename(filename) {
+  const match = /(?:IMG|VID)-20(\d{2})(\d{2})(\d{2})-WA/.exec(filename);
+  if (!match) return '2026-06-16'; // repo import date for non-WhatsApp assets
+  return `20${match[1]}-${match[2]}-${match[3]}`;
+}
+
+// De-dupe on the ASSET, not the caption: exact filename (normalized) is the
+// fingerprint here, standing in for the storage_path / byte-hash unique
+// index the Supabase migration will provide. Two different photos sharing a
+// title are NOT duplicates; two rows pointing at the same file are.
+function dedupeByAsset(items) {
+  const seen = new Map();
+  return items.filter((item) => {
+    const key = item.image.split('/').pop().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.set(key, true);
+    return true;
+  });
+}
+
+// Newest-first: sort by capture date (desc), then WhatsApp sequence number
+// (desc) within the same day. Runs once at module load.
+const galleryItems = dedupeByAsset(rawGalleryItems)
+  .map((item) => ({
+    ...item,
+    capturedAt: captureDateFromFilename(item.image),
+  }))
+  .sort((a, b) => {
+    if (a.capturedAt !== b.capturedAt) return a.capturedAt < b.capturedAt ? 1 : -1;
+    const seq = (it) => {
+      const m = /-WA(\d+)/.exec(it.image);
+      return m ? parseInt(m[1], 10) : 0;
+    };
+    return seq(b) - seq(a);
+  });
 
 function GalleryCard({ item }) {
   const [hovered, setHovered] = useState(false);
