@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import DepthCarousel from '../components/ui/DepthCarousel';
 
 /* ─── GALLERY DATA SOURCE & ORDERING (read before editing) ──────────────
  * Items are ordered NEWEST-FIRST. Each asset's filename encodes its capture
@@ -314,6 +315,51 @@ const rawGalleryItems = [
   }
 ];
 
+/* ─── Grouping: which event/school each photo belongs to ─────────────────
+ * A photo can belong to exactly one group. Group membership is derived from
+ * each photo's position in the former 3-column, newest-first grid
+ * (40 photos → 14 rows), which the team curates by hand:
+ *   - Limuru Girls High School  → the bottom 2 rows of that layout
+ *   - Alliance Boys High School → the top 3 rows + row 4, column 1
+ *   - Daraja Fest #1            → everything else (fallback: any photo
+ *       not claimed by the two sets above)
+ * If you re-add or reorder photos, update the id lists below.
+ * ───────────────────────────────────────────────────────────────────── */
+const GROUPS = {
+  'limuru-girls': {
+    name: 'Limuru Girls High School',
+    kicker: 'School Outreach Visit',
+    description:
+      'Scenes from our outreach day at Limuru Girls High School — sessions on the lawn, group circles, and moments with the students.',
+    ids: new Set([20, 19, 16, 15])
+  },
+  'alliance-boys': {
+    name: 'Alliance Boys High School',
+    kicker: 'School Outreach Visit',
+    description:
+      'Highlights from our visit to Alliance Boys High School — conversations, workshops, and connection with the students.',
+    ids: new Set([70, 69, 68, 67, 66, 65, 64, 63, 62, 61])
+  },
+  'daraja-fest-1': {
+    name: 'Daraja Fest #1',
+    kicker: 'Community Celebration',
+    description:
+      'The first edition of Daraja Fest — celebrations, gift tables, cake, and the community coming together under one tent.',
+    ids: new Set([]) // fallback group: every photo not claimed above
+  }
+};
+
+const GROUP_ORDER = ['limuru-girls', 'alliance-boys', 'daraja-fest-1'];
+
+// Cap on how many photos rotate inside the on-page carousel; the full set
+// opens in the "See more" dialog.
+const CAROUSEL_LIMIT = 10;
+
+function groupForItem(item) {
+  const entry = Object.entries(GROUPS).find(([, group]) => group.ids.has(item.id));
+  return entry ? entry[0] : 'daraja-fest-1';
+}
+
 /* ─── Order + de-dupe pipeline (static-data stand-in for the SQL in the
  * migration note above) ─────────────────────────────────────────────── */
 
@@ -356,48 +402,131 @@ const galleryItems = dedupeByAsset(rawGalleryItems)
     return seq(b) - seq(a);
   });
 
-function GalleryCard({ item }) {
-  const [hovered, setHovered] = useState(false);
+function GalleryGroupSection({ group, items }) {
+  const [open, setOpen] = useState(false);
+  const carouselItems = items.slice(0, CAROUSEL_LIMIT);
+
+  // Close the "See more" dialog on Escape and lock body scroll while open.
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
 
   return (
-    <div
-      className={`relative mb-6 rounded-2xl overflow-hidden cursor-pointer group ${item.height}`}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}>
+    <section className="py-14 md:py-16 px-4 border-b border-brand-gold/10 last:border-b-0">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-widest text-brand-gold">{group.kicker}</span>
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-brand-charcoal mt-2">{group.name}</h2>
+            <p className="text-brand-body text-base leading-relaxed max-w-2xl mt-2">{group.description}</p>
+          </div>
+          <p className="text-sm text-brand-body/70 shrink-0">
+            {items.length} photo{items.length === 1 ? '' : 's'} · showing {carouselItems.length} here
+          </p>
+        </div>
 
-      <img
-        src={item.image}
-        alt={item.desc}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        loading="lazy"
-      />
+        <div className="relative h-[560px] w-full overflow-hidden rounded-3xl bg-brand-charcoal shadow-xl">
+          <DepthCarousel
+            items={carouselItems.map((item) => ({ image: item.image, alt: item.desc }))}
+            cardWidth={340}
+            cardHeight={420}
+            radius={20}
+            depth={220}
+            spread={90}
+            tilt={22}
+            tiltDirection="right"
+            perspective={1400}
+            visibleCards={4}
+            falloff={0.2}
+            blur={6}
+            autoplay
+            loop
+          />
+        </div>
 
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          backgroundImage: `radial-gradient(circle at 30% 40%, rgba(255,255,255,0.3) 0%, transparent 50%), radial-gradient(circle at 70% 60%, rgba(0,0,0,0.2) 0%, transparent 50%)`
-        }} />
+        <div className="mt-5 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="rounded-full border border-brand-charcoal/20 bg-brand-charcoal px-5 py-2.5 text-sm font-semibold text-brand-cream shadow transition hover:bg-brand-charcoal/85 hover:border-brand-charcoal/40">
+            See More from {group.name}
+          </button>
+        </div>
 
-      {/* Location tag — always visible */}
-      <div className="absolute top-3 right-3 z-10">
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-black/30 text-white backdrop-blur-sm">
-          {item.country}
-        </span>
+        {open && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            onClick={() => setOpen(false)}>
+            <div
+              className="max-h-[85vh] w-full max-w-5xl overflow-hidden rounded-2xl bg-brand-cream shadow-2xl"
+              onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-start justify-between gap-4 border-b border-brand-gold/15 px-6 py-4">
+                <div>
+                  <h3 className="font-display text-2xl font-bold text-brand-charcoal">{group.name}</h3>
+                  <p className="text-sm text-brand-body">
+                    All {items.length} photos from this {group.kicker.toLowerCase()}.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close"
+                  className="rounded-full p-2 text-brand-charcoal/60 transition hover:bg-brand-charcoal/10 hover:text-brand-charcoal">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </div>
+              <div className="grid max-h-[70vh] grid-cols-2 gap-4 overflow-y-auto p-6 sm:grid-cols-3 lg:grid-cols-4">
+                {items.map((item) => (
+                  <figure key={item.id} className="group relative aspect-[4/5] overflow-hidden rounded-xl bg-black">
+                    <img
+                      src={item.image}
+                      alt={item.desc}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <figcaption
+                      className="absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/85 via-black/20 to-transparent p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-brand-gold">{item.prompt}</span>
+                      <span className="mt-1 font-body text-[11px] leading-snug text-brand-cream/80">{item.desc}</span>
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Hover overlay */}
-      <div className={`absolute inset-0 bg-brand-dark/85 flex flex-col justify-end p-5 transition-opacity duration-300 ${hovered ? 'opacity-100' : 'opacity-0'}`}>
-        <span className="text-xs font-semibold uppercase tracking-wider text-brand-gold mb-2">
-          {item.prompt}
-        </span>
-        <p className="font-body text-sm text-brand-cream/85 leading-relaxed mb-3">{item.desc}</p>
-        <p className="text-xs text-brand-cream/50">{item.artist}</p>
-      </div>
-    </div>
+    </section>
   );
 }
 
 export default function Gallery() {
+  const groupSections = useMemo(() => {
+    const grouped = {};
+    for (const item of galleryItems) {
+      const key = groupForItem(item);
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(item);
+    }
+    return GROUP_ORDER.filter((key) => grouped[key]?.length).map((key) => ({
+      key,
+      group: GROUPS[key],
+      items: grouped[key]
+    }));
+  }, []);
+
   return (
     <div className="bg-brand-cream min-h-screen">
       <section className="py-20 md:py-28 px-4 border-b border-brand-gold/15">
@@ -410,14 +539,14 @@ export default function Gallery() {
         </div>
       </section>
 
-      <section className="py-16 md:py-24 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {galleryItems.map((item) => (
-              <GalleryCard key={item.id} item={item} />
-            ))}
-          </div>
-        </div>
+      <section className="py-8 md:py-10">
+        {groupSections.length === 0 ? (
+          <p className="py-16 text-center text-brand-body">No gallery photos yet — check back soon.</p>
+        ) : (
+          groupSections.map(({ key, group, items }) => (
+            <GalleryGroupSection key={key} group={group} items={items} />
+          ))
+        )}
       </section>
     </div>
   );
