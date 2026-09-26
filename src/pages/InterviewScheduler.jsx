@@ -13,6 +13,10 @@ const nextTuesday = () => {
 };
 const formatTime = (time) => new Date(`1970-01-01T${time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 const formatDate = (date) => new Date(`${date}T12:00:00`).toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+const describeError = (error) => {
+  if (error?.message && error.message !== 'TypeError: Failed to fetch') return error.message;
+  return 'We could not reach the scheduling service. Please refresh and try again.';
+};
 
 function calendarLinks(slot, applicant) {
   const start = `${slot.slot_date.replaceAll('-', '')}T${slot.starts_at.replaceAll(':', '').slice(0, 4)}00`;
@@ -46,9 +50,14 @@ export default function InterviewScheduler() {
 
   const loadSlots = useCallback(async () => {
     setLoading(true); setError('');
-    const { data, error: loadError } = await supabase.rpc('get_interview_slots', { p_week_start: weekStart });
-    if (loadError) setError(loadError.message); else setSlots(data || []);
-    setLoading(false);
+    try {
+      const { data, error: loadError } = await supabase.rpc('get_interview_slots', { p_week_start: weekStart });
+      if (loadError) setError(describeError(loadError)); else setSlots(data || []);
+    } catch (loadError) {
+      setError(describeError(loadError));
+    } finally {
+      setLoading(false);
+    }
   }, [weekStart]);
 
   useEffect(() => { loadSlots(); }, [loadSlots]);
@@ -114,7 +123,7 @@ export default function InterviewScheduler() {
         <div className="rounded-3xl border border-brand-cream-light bg-brand-card p-5 sm:p-7">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Step 1</p><h2 className="text-2xl font-bold">Choose a live slot</h2></div><input type="date" value={weekStart} onChange={(event) => setWeekStart(event.target.value)} className="rounded-lg border border-brand-cream-light bg-white px-3 py-2 text-sm" /></div>
           <div className="mb-5 grid grid-cols-3 gap-2">{WEEKDAYS.map((item) => <button key={item.day} onClick={() => setDay(item.day)} className={`rounded-xl border p-3 text-left ${day === item.day ? 'border-brand-gold bg-brand-cta-surface' : 'border-brand-cream-light bg-white'}`}><p className="font-bold">{item.label}</p><p className="text-xs text-brand-body">{item.hours}</p></button>)}</div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{visibleSlots.map((slot) => <button key={slot.id} disabled={slot.status !== 'available'} onClick={() => setSelectedSlot(slot)} className={`rounded-xl border p-3 text-left transition ${selectedSlot?.id === slot.id ? 'border-brand-gold bg-brand-gold text-white' : slot.status === 'available' ? 'border-green-200 bg-green-50 hover:border-brand-forest' : 'cursor-not-allowed border-stone-200 bg-stone-100 text-stone-500'}`}><Clock3 className="mb-2 h-4 w-4" /><p className="font-bold">{formatTime(slot.starts_at)}</p><p className="text-xs">{slot.status === 'available' ? 'Available' : 'Booked'}</p></button>)}</div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{visibleSlots.map((slot) => <button key={slot.id} disabled={slot.status !== 'available'} onClick={() => setSelectedSlot(slot)} className={`rounded-xl border p-3 text-left transition ${selectedSlot?.id === slot.id ? 'border-brand-gold bg-brand-gold text-white' : slot.status === 'available' ? 'border-green-200 bg-green-50 hover:border-brand-forest' : 'cursor-not-allowed border-stone-200 bg-stone-100 text-stone-700'}`}><Clock3 className="mb-2 h-4 w-4" /><p className="font-bold">{formatTime(slot.starts_at)}</p><p className="text-xs">{slot.status === 'available' ? 'Available' : 'Booked'}</p></button>)}</div>
           {loading && <p className="mt-4 text-sm text-brand-body">Loading live availability…</p>}
         </div>
         <form onSubmit={book} className="rounded-3xl border border-brand-cream-light bg-brand-card p-5 sm:p-7"><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Step 2</p><h2 className="mb-1 text-2xl font-bold">Applicant details</h2><p className="mb-5 text-sm text-brand-body">{selectedSlot ? `${formatDate(selectedSlot.slot_date)} · ${formatTime(selectedSlot.starts_at)}` : 'Select a green slot to continue.'}</p><div className="space-y-3">{[['full_name', 'Full name'], ['email', 'Email address'], ['phone', 'Phone number'], ['institution', 'Institution / Organization']].map(([name, label]) => <label key={name} className="block text-sm font-semibold">{label}<input required value={form[name]} onChange={(event) => setForm({ ...form, [name]: event.target.value })} type={name === 'email' ? 'email' : 'text'} className="mt-1 w-full rounded-lg border border-brand-cream-light bg-white px-3 py-2.5 font-normal" /></label>)}<label className="block text-sm font-semibold">Role / Department<select required value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} className="mt-1 w-full rounded-lg border border-brand-cream-light bg-white px-3 py-2.5 font-normal"><option value="">Select a role</option>{ROLES.map((role) => <option key={role}>{role}</option>)}</select></label><label className="block text-sm font-semibold">Interview method & accommodation requests<textarea value={form.interview_preferences} onChange={(event) => setForm({ ...form, interview_preferences: event.target.value })} placeholder="Preferred method for interview (e.g. Google Meet, Zoom), specific needs, or accommodation requests..." className="mt-1 min-h-28 w-full rounded-lg border border-brand-cream-light bg-white px-3 py-2.5 font-normal" /></label><button disabled={!selectedSlot} className="w-full rounded-xl bg-brand-gold px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Confirm & reserve slot</button></div></form>
