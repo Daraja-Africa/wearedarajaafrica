@@ -11,6 +11,7 @@ const navLinks = [
   { label: 'Get Involved', path: '/get-involved' },
   { label: 'Our Impact', path: '/our-impact' },
   { label: 'Announcements', path: '/announcements' },
+  { label: 'Schedule', path: '/schedule' },
 ];
 
 // Focus ring shared by every interactive element in the floating nav so
