@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daraja Africa Network - Online Interview Scheduler & Delegation Calendar</title>
+
+    <!-- Chosen Palette: Warm Neutral & Teal/Indigo Professional Accent -->
+    <!-- Application Structure Plan: Single Page Application designed as a dual-role scheduling ecosystem. It features a top navigation bar allowing seamless switching between the 'Applicant Booking Portal' and the 'Interviewer Delegation Dashboard'. The Applicant view allows candidates to select days (Tues 2-6PM, Wed 2-6PM, Thurs 9AM-4PM), choose available 30-min slots, and submit applications with role selections and preferred interview methods. Slots immediately lock upon booking. The Admin view provides a full weekly calendar grid, workload allocation charts (Chart.js), delegate assignment controls, calendar sync export (.ics generation), and search/filter mechanisms for interviewers to divide applicant sessions effortlessly. -->
+    <!-- Visualization & Content Choices:
+    1. Weekly Master Calendar Grid -> Goal: Organize -> Interactive HTML/Tailwind Matrix -> Visualizes Tuesday (8 slots), Wednesday (8 slots), and Thursday (14 slots) with real-time status badges.
+    2. Interviewer Workload Chart -> Goal: Compare -> Interactive Donut Chart (Chart.js Canvas) -> Shows interview count assigned per interviewer team member.
+    3. Applicant Booking Wizard -> Goal: Actionable Tool -> Step-by-step form with updated volunteer roles, preferred interview platform choices, dynamic slot filtering, and instant slot locking.
+    4. Delegation Panel -> Goal: Manage -> Dynamic assignment modal and inline dropdowns to assign candidates to specific interviewers.
+    5. Calendar Sync -> Goal: Integration -> One-click iCal/Google Calendar link generator.
+    NO SVG OR MERMAID JS USED. Chart.js rendered on Canvas elements within styled parent containers. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        indigoBrand: {
+                            50: '#eef2ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        warmBg: '#faf9f6',
+                        cardBg: '#ffffff',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 260px;
+            max-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 280px;
+            }
+        }
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #faf9f6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-warmBg text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
+
+    <!-- Top Sticky Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-stone-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center py-3 md:h-20 gap-3">
+                
+                <!-- Brand Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-xl shadow">
+                        D
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-base sm:text-lg text-slate-900 leading-tight">Daraja Africa Network</span>
+                            <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Live Scheduler</span>
+                        </div>
+                        <span class="text-xs text-stone-500 block">Youth Peer Support & Advisory Interview System</span>
+                    </div>
+                </div>
+
+                <!-- Mode View Switcher (Dual Portal Toggle) -->
+                <div class="flex items-center bg-stone-100 p-1 rounded-xl border border-stone-200 text-xs font-semibold">
+                    <button id="btn-view-applicant" onclick="switchView('applicant')" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white text-brand-700 shadow-sm">
+                        <span>👤 Applicant Portal</span>
+                    </button>
+                    <button id="btn-view-admin" onclick="switchView('admin')" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-stone-600 hover:text-slate-900">
+                        <span>🗓️ Interviewer Hub</span>
+                        <span id="badge-unassigned-count" class="bg-amber-500 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1 font-bold">3</span>
+                    </button>
+                </div>
+
+                <!-- Active Week Selector & Quick Stats -->
+                <div class="hidden lg:flex items-center space-x-3 text-xs bg-stone-50 px-3 py-1.5 rounded-lg border border-stone-200">
+                    <span class="text-stone-500 font-medium">Session Week:</span>
+                    <select id="week-selector" onchange="changeWeek(this.value)" class="bg-transparent font-bold text-slate-800 focus:outline-none cursor-pointer">
+                        <option value="current">Next Week (Tue-Thu)</option>
+                        <option value="following">Following Week</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ========================================================= -->
+        <!-- VIEW 1: APPLICANT BOOKING PORTAL                          -->
+        <!-- ========================================================= -->
+        <section id="view-applicant" class="space-y-6">
+            
+            <!-- Hero Introduction -->
+            <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-slate-900 text-white rounded-2xl p-6 sm:p-8 shadow-md relative overflow-hidden">
+                <div class="max-w-3xl space-y-3 relative z-10">
+                    <div class="inline-flex items-center space-x-2 bg-brand-500/20 border border-brand-400/30 px-3 py-1 rounded-full text-brand-200 text-xs font-semibold">
+                        <span>⚡ Interview Schedule Allocation</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                        Schedule Your Interview Session
+                    </h1>
+                    <p class="text-stone-200 text-xs sm:text-sm leading-relaxed">
+                        Welcome! Please select your department/role, choose your preferred date and available 30-minute time slot. Once submitted, your interview slot will be locked automatically and assigned to our interview panel.
+                    </p>
+                    
+                    <!-- Client Schedule Rules Visual Indicator -->
+                    <div class="pt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/10 p-2.5 rounded-lg flex items-center space-x-2">
+                            <span class="text-amber-300 font-bold text-base">Tue</span>
+                            <div>
+                                <span class="font-bold block text-white">Tuesday Afternoon</span>
+                                <span class="text-stone-300 text-[11px]">2:00 PM – 6:00 PM (8 slots)</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/10 p-2.5 rounded-lg flex items-center space-x-2">
+                            <span class="text-amber-300 font-bold text-base">Wed</span>
+                            <div>
+                                <span class="font-bold block text-white">Wednesday Afternoon</span>
+                                <span class="text-stone-300 text-[11px]">2:00 PM – 6:00 PM (8 slots)</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/10 p-2.5 rounded-lg flex items-center space-x-2">
+                            <span class="text-emerald-300 font-bold text-base">Thu</span>
+                            <div>
+                                <span class="font-bold block text-white">Thursday All Day</span>
+                                <span class="text-stone-300 text-[11px]">9:00 AM – 4:00 PM (14 slots)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Interactive Form Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left Column: Date & Slot Selection (7 cols) -->
+                <div class="lg:col-span-7 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-6">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">1</span>
+                            <span>Select Session Day & Available Slot</span>
+                        </h2>
+                        <p class="text-xs text-stone-500 mt-1">Click on an available 30-minute slot below. Locked slots cannot be selected.</p>
+                    </div>
+
+                    <!-- Day Selection Tabs -->
+                    <div class="grid grid-cols-3 gap-2 p-1 bg-stone-100 rounded-xl text-xs font-bold text-center">
+                        <button onclick="selectApplicantDay('Tuesday')" id="tab-day-tuesday" class="py-2.5 rounded-lg transition bg-white text-brand-700 shadow-sm border border-stone-200">
+                            Tuesday<br><span class="text-[10px] font-normal text-stone-500">2 PM - 6 PM</span>
+                        </button>
+                        <button onclick="selectApplicantDay('Wednesday')" id="tab-day-wednesday" class="py-2.5 rounded-lg transition text-stone-600 hover:text-slate-900">
+                            Wednesday<br><span class="text-[10px] font-normal text-stone-500">2 PM - 6 PM</span>
+                        </button>
+                        <button onclick="selectApplicantDay('Thursday')" id="tab-day-thursday" class="py-2.5 rounded-lg transition text-stone-600 hover:text-slate-900">
+                            Thursday<br><span class="text-[10px] font-normal text-stone-500">9 AM - 4 PM</span>
+                        </button>
+                    </div>
+
+                    <!-- Time Slots Container -->
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider" id="applicant-selected-day-label">Tuesday Slots</span>
+                            <div class="flex items-center space-x-3 text-[11px]">
+                                <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span><span class="text-stone-600">Available</span></span>
+                                <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span><span class="text-stone-600">Filled</span></span>
+                                <span class="flex items-center space-x-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-600"></span><span class="text-stone-600">Your Pick</span></span>
+                            </div>
+                        </div>
+
+                        <!-- Slots Grid -->
+                        <div id="applicant-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <!-- JS populated slots -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Candidate Information Form (5 cols) -->
+                <div class="lg:col-span-5 bg-white p-6 rounded-2xl border border-stone-200 shadow-sm space-y-5">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-xs font-bold">2</span>
+                            <span>Applicant Details</span>
+                        </h2>
+                        <p class="text-xs text-stone-500 mt-1">Provide your details to lock this appointment into our calendar.</p>
+                    </div>
+
+                    <!-- Selected Slot Summary Banner -->
+                    <div id="selected-slot-banner" class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-base">🕒</span>
+                            <div>
+                                <span class="font-bold block" id="banner-slot-time">No slot selected</span>
+                                <span class="text-[11px] text-amber-700" id="banner-slot-date">Please pick a slot on the left</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] bg-amber-200 text-amber-900 px-2 py-0.5 rounded font-bold uppercase">Pending Pick</span>
+                    </div>
+
+                    <form id="applicant-form" onsubmit="handleApplicantBooking(event)" class="space-y-4 text-xs">
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Full Name *</label>
+                            <input type="text" id="applicant-name" required placeholder="e.g. Mercy Wanjiru" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Email Address *</label>
+                                <input type="email" id="applicant-email" required placeholder="m.wanjiru@example.com" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-slate-700 mb-1">Phone Number *</label>
+                                <input type="tel" id="applicant-phone" required placeholder="+254 712 345 678" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Role / Department Applied For *</label>
+                            <select id="applicant-role" required class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white font-medium text-slate-800">
+                                <option value="" disabled selected>-- Select Role --</option>
+                                <option value="Facilitating Sessions">Facilitating Sessions</option>
+                                <option value="Peer engagement">Peer engagement</option>
+                                <option value="Events">Events</option>
+                                <option value="Research">Research</option>
+                                <option value="Comms">Comms</option>
+                                <option value="IT">IT</option>
+                                <option value="Monitoring and Evaluation">Monitoring and Evaluation</option>
+                                <option value="Training Dpt">Training Dpt</option>
+                                <option value="Partnerships">Partnerships</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Institution / Organization (Optional)</label>
+                            <input type="text" id="applicant-institution" placeholder="e.g. University of Nairobi / Kenyatta University" class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-slate-700 mb-1">Preferred Method for Interview & Accommodation Requests</label>
+                            <textarea id="applicant-notes" rows="2" placeholder="Preferred method for interview (e.g. Google Meet, Zoom), specific needs, or accommodation requests..." class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                        </div>
+
+                        <button type="submit" id="btn-submit-booking" disabled class="w-full bg-stone-300 text-stone-500 font-bold py-3 rounded-xl transition shadow text-xs cursor-not-allowed">
+                            Confirm & Reserve Interview Slot
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- VIEW 2: ADMIN & INTERVIEWER MANAGEMENT HUB                -->
+        <!-- ========================================================= -->
+        <section id="view-admin" class="hidden space-y-6">
+            
+            <!-- Admin Top Control Banner -->
+            <div class="bg-white rounded-2xl border border-stone-200 p-6 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="text-xl font-bold text-slate-900">Interviewer Delegation & Master Schedule Hub</h2>
+                            <span class="bg-brand-100 text-brand-800 text-xs font-bold px-2.5 py-0.5 rounded-full">30 Weekly Slots</span>
+                        </div>
+                        <p class="text-xs text-stone-500 mt-1">Review incoming bookings, delegate interviewers to candidates, and export calendar feeds.</p>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <button onclick="filterAdminCalendar('all')" id="filter-btn-all" class="filter-admin-btn bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow-sm">
+                            All Slots
+                        </button>
+                        <button onclick="filterAdminCalendar('unassigned')" id="filter-btn-unassigned" class="filter-admin-btn bg-stone-100 text-stone-700 hover:bg-stone-200 px-3 py-1.5 rounded-lg font-semibold transition">
+                            ⚠️ Unassigned Only
+                        </button>
+                        <button onclick="exportMasterCalendarICS()" class="bg-stone-800 hover:bg-slate-900 text-white px-3 py-1.5 rounded-lg font-semibold transition flex items-center space-x-1">
+                            <span>📥 Export Calendar (.ics)</span>
+                        </button>
+                        <button onclick="resetScheduleDemo()" class="text-stone-400 hover:text-rose-600 px-2 py-1.5 text-xs font-medium transition" title="Reset back to initial demo dataset">
+                            ↺ Reset Demo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Summary Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div class="p-3 bg-stone-50 rounded-xl border border-stone-200">
+                        <span class="text-stone-500 block text-[11px] font-medium uppercase tracking-wider">Total Weekly Capacity</span>
+                        <span class="text-xl font-extrabold text-slate-900 mt-0.5 block">30 Slots</span>
+                        <span class="text-[10px] text-stone-500">Tue (8), Wed (8), Thu (14)</span>
+                    </div>
+
+                    <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200">
+                        <span class="text-emerald-800 block text-[11px] font-medium uppercase tracking-wider">Booked Applications</span>
+                        <span class="text-xl font-extrabold text-emerald-900 mt-0.5 block" id="kpi-booked-count">12 / 30</span>
+                        <span class="text-[10px] text-emerald-700" id="kpi-booked-pct">40% Filled</span>
+                    </div>
+
+                    <div class="p-3 bg-amber-50 rounded-xl border border-amber-200">
+                        <span class="text-amber-800 block text-[11px] font-medium uppercase tracking-wider">Needs Interviewer</span>
+                        <span class="text-xl font-extrabold text-amber-900 mt-0.5 block" id="kpi-unassigned-count">3 Candidates</span>
+                        <span class="text-[10px] text-amber-700">Action Required</span>
+                    </div>
+
+                    <div class="p-3 bg-indigoBrand-50 rounded-xl border border-indigoBrand-100">
+                        <span class="text-indigoBrand-700 block text-[11px] font-medium uppercase tracking-wider">Active Interviewers</span>
+                        <span class="text-xl font-extrabold text-indigoBrand-900 mt-0.5 block">4 Team Members</span>
+                        <span class="text-[10px] text-indigoBrand-600">Delegated Workload</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Master Calendar Schedule Matrix & Delegation Workload Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Master Weekly Schedule Columns (8 cols) -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <div class="flex items-center justify-between bg-white p-4 rounded-xl border border-stone-200">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm">Weekly Master Calendar Matrix</h3>
+                            <p class="text-xs text-stone-500">Click any booked candidate card to reassign interviewers or view details.</p>
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="text-stone-500 font-medium">Filter Interviewer:</span>
+                            <select id="admin-interviewer-filter" onchange="renderAdminScheduleMatrix()" class="bg-stone-50 border border-stone-200 rounded-lg px-2 py-1 font-semibold text-slate-800 text-xs focus:outline-none">
+                                <option value="all">All Interviewers</option>
+                                <option value="Dr. Sarah Wanjiku">Dr. Sarah Wanjiku</option>
+                                <option value="Michael Omondi">Michael Omondi</option>
+                                <option value="Grace Muthoni">Grace Muthoni</option>
+                                <option value="Alex Kioko">Alex Kioko</option>
+                                <option value="Unassigned">Unassigned Only</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3 Column Layout for Tuesday, Wednesday, Thursday -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <!-- Tuesday Column (2 PM - 6 PM) -->
+                        <div class="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
+                            <div class="border-b border-stone-100 pb-2.5 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">Tuesday</h4>
+                                    <span class="text-[11px] text-stone-500">2:00 PM – 6:00 PM</span>
+                                </div>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full" id="tue-slot-count">8 Slots</span>
+                            </div>
+                            <div id="matrix-tuesday-container" class="space-y-2">
+                                <!-- Dynamic Tuesday Slot Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Wednesday Column (2 PM - 6 PM) -->
+                        <div class="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
+                            <div class="border-b border-stone-100 pb-2.5 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">Wednesday</h4>
+                                    <span class="text-[11px] text-stone-500">2:00 PM – 6:00 PM</span>
+                                </div>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full" id="wed-slot-count">8 Slots</span>
+                            </div>
+                            <div id="matrix-wednesday-container" class="space-y-2">
+                                <!-- Dynamic Wednesday Slot Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Thursday Column (9 AM - 4 PM) -->
+                        <div class="bg-white rounded-xl border border-stone-200 p-4 space-y-3">
+                            <div class="border-b border-stone-100 pb-2.5 flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-sm">Thursday</h4>
+                                    <span class="text-[11px] text-stone-500">9:00 AM – 4:00 PM</span>
+                                </div>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full" id="thu-slot-count">14 Slots</span>
+                            </div>
+                            <div id="matrix-thursday-container" class="space-y-2">
+                                <!-- Dynamic Thursday Slot Cards -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Column: Delegation Controls & Interviewer Workload Chart (4 cols) -->
+                <div class="lg:col-span-4 space-y-6">
+                    
+                    <!-- Interviewer Workload Distribution Chart -->
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                        <h3 class="font-bold text-slate-900 text-sm border-b pb-2 border-stone-100">
+                            Interviewer Workload Allocation
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="workloadChart"></canvas>
+                        </div>
+                        <p class="text-[11px] text-stone-500 text-center">
+                            Calculated dynamically based on active session delegation.
+                        </p>
+                    </div>
+
+                    <!-- Quick Batch Delegation Box -->
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                        <h3 class="font-bold text-slate-900 text-sm border-b pb-2 border-stone-100 flex justify-between items-center">
+                            <span>Pending Delegations</span>
+                            <span class="text-xs font-normal text-amber-700 bg-amber-50 px-2 py-0.5 rounded font-bold" id="pending-counter-pill">3 Needs Assignment</span>
+                        </h3>
+                        
+                        <div id="unassigned-list-container" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                            <!-- JS Populated list of candidates needing interviewers -->
+                        </div>
+                    </div>
+
+                    <!-- Add Custom Interviewer Team Member -->
+                    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-3">
+                        <h3 class="font-bold text-slate-900 text-sm">Add Team Interviewer</h3>
+                        <div class="flex space-x-2 text-xs">
+                            <input type="text" id="new-interviewer-name" placeholder="e.g. David Mwangi" class="flex-grow px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <button onclick="addInterviewerTeamMember()" class="bg-brand-600 hover:bg-brand-700 text-white font-bold px-3 py-2 rounded-lg transition">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Delegation Modal for Slot Assignment -->
+    <div id="delegation-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl border border-stone-200 max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-base">Delegate Interviewer</h3>
+                <button onclick="closeDelegationModal()" class="text-stone-400 hover:text-slate-800 text-lg font-bold">✕</button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div class="p-3 bg-stone-50 rounded-xl space-y-1">
+                    <span class="text-stone-500 text-[11px] block font-semibold uppercase">Candidate Details</span>
+                    <p class="font-bold text-slate-900 text-sm" id="modal-candidate-name">Applicant Name</p>
+                    <p class="text-stone-600" id="modal-candidate-meta">Role • Email</p>
+                    <p class="text-brand-700 font-semibold" id="modal-slot-time">Tuesday 2:00 PM - 2:30 PM</p>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Assign Interviewer Team Member:</label>
+                    <select id="modal-interviewer-select" class="w-full px-3 py-2 border border-stone-300 rounded-lg bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs font-medium">
+                        <!-- JS filled interviewers list -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Internal Notes for Interview Panel:</label>
+                    <textarea id="modal-internal-notes" rows="2" placeholder="e.g. Focus on peer counseling experience..." class="w-full px-3 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none text-xs"></textarea>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-2 pt-2 border-t border-stone-100">
+                <button onclick="closeDelegationModal()" class="px-4 py-2 rounded-lg bg-stone-100 text-stone-700 font-bold text-xs hover:bg-stone-200 transition">Cancel</button>
+                <button onclick="confirmModalDelegation()" class="px-4 py-2 rounded-lg bg-brand-600 text-white font-bold text-xs hover:bg-brand-700 transition shadow">Save Assignment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-success-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 text-center">
+            <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-2xl font-extrabold mx-auto">
+                ✓
+            </div>
+            <div>
+                <h3 class="font-extrabold text-slate-900 text-xl">Interview Slot Locked!</h3>
+                <p class="text-xs text-stone-500 mt-1">Your application and interview reservation have been submitted.</p>
+            </div>
+
+            <div class="p-4 bg-stone-50 rounded-xl border border-stone-200 text-xs text-left space-y-2">
+                <div class="flex justify-between border-b pb-1">
+                    <span class="text-stone-500">Applicant:</span>
+                    <strong class="text-slate-900" id="success-name">--</strong>
+                </div>
+                <div class="flex justify-between border-b pb-1">
+                    <span class="text-stone-500">Date & Time:</span>
+                    <strong class="text-brand-700" id="success-time">--</strong>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-stone-500">Reference Code:</span>
+                    <strong class="font-mono text-slate-800" id="success-code">DAR-8921</strong>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="downloadSingleICS()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                    <span>📅 Add to Google / Apple Calendar (.ics)</span>
+                </button>
+                <button onclick="closeSuccessModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-2.5 rounded-xl text-xs transition">
+                    Done
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Popup -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center space-x-2">
+        <span class="text-brand-400 text-base">✓</span>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- Global Footer -->
+    <footer class="bg-slate-900 text-stone-400 text-xs py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+                <p class="text-stone-200 font-semibold">Daraja Africa Network - Online Interview Scheduler</p>
+                <p class="text-[11px] text-stone-500">Custom 30-min session manager conforming to Tuesday (2-6PM), Wednesday (2-6PM), and Thursday (9AM-4PM) rules.</p>
+            </div>
+            <div class="text-stone-500 text-[11px]">
+                Internal Operations Portal 2026
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // CLIENT SCHEDULE DEFINITIONS & CONFIGURATION
+        // Tuesday: 2:00 PM to 6:00 PM (14:00 - 18:00) -> 8 slots
+        // Wednesday: 2:00 PM to 6:00 PM (14:00 - 18:00) -> 8 slots
+        // Thursday: 9:00 AM to 4:00 PM (09:00 - 16:00) -> 14 slots
+        // Slot duration: 30 minutes
+
+        const CLIENT_SCHEDULE_RULES = {
+            Tuesday: { startHour: 14, endHour: 18, label: 'Tuesday (2:00 PM – 6:00 PM)' },
+            Wednesday: { startHour: 14, endHour: 18, label: 'Wednesday (2:00 PM – 6:00 PM)' },
+            Thursday: { startHour: 9, endHour: 16, label: 'Thursday (9:00 AM – 4:00 PM)' }
+        };
+
+        // Available Interviewers List
+        let interviewers = [
+            'Dr. Sarah Wanjiku',
+            'Michael Omondi',
+            'Grace Muthoni',
+            'Alex Kioko'
+        ];
+
+        // Global State variable
+        let slotsState = {};
+        let selectedApplicantDay = 'Tuesday';
+        let selectedApplicantSlotId = null;
+        let activeModalSlotId = null;
+        let workloadChartInstance = null;
+        let currentAdminFilter = 'all';
+        let lastCreatedBooking = null;
+
+        // Helper to generate time string format e.g., "14:00" -> "2:00 PM"
+        function formatTimeLabel(hour, minute) {
+            const h = hour % 12 === 0 ? 12 : hour % 12;
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const m = minute === 0 ? '00' : minute;
+            return `${h}:${m} ${ampm}`;
+        }
+
+        // Generate full 30 slots key collection based on client rules
+        function generateEmptySchedule() {
+            const schedule = {};
+            
+            Object.keys(CLIENT_SCHEDULE_RULES).forEach(day => {
+                const rule = CLIENT_SCHEDULE_RULES[day];
+                let currentMinutes = rule.startHour * 60;
+                const endMinutes = rule.endHour * 60;
+
+                while (currentMinutes < endMinutes) {
+                    const startH = Math.floor(currentMinutes / 60);
+                    const startM = currentMinutes % 60;
+                    const nextMinutes = currentMinutes + 30;
+                    const endH = Math.floor(nextMinutes / 60);
+                    const endM = nextMinutes % 60;
+
+                    const startTimeStr = formatTimeLabel(startH, startM);
+                    const endTimeStr = formatTimeLabel(endH, endM);
+                    const slotId = `${day.toLowerCase()}-${startH}${startM === 0 ? '00' : startM}`;
+
+                    schedule[slotId] = {
+                        id: slotId,
+                        day: day,
+                        timeRange: `${startTimeStr} – ${endTimeStr}`,
+                        startTime: startTimeStr,
+                        isBooked: false,
+                        candidate: null,
+                        interviewer: null,
+                        notes: ''
+                    };
+
+                    currentMinutes = nextMinutes;
+                }
+            });
+
+            return schedule;
+        }
+
+        // Seed realistic demo data with updated roles
+        function seedDemoData() {
+            const state = generateEmptySchedule();
+
+            // Seed 12 pre-booked slots to showcase the delegation dashboard
+            const sampleBookings = [
+                { id: 'tuesday-1400', name: 'Faith Kiprop', email: 'f.kiprop@uonbi.ac.ke', phone: '+254 711 223 344', role: 'Facilitating Sessions', interviewer: 'Dr. Sarah Wanjiku', notes: 'Prefers Google Meet. Experienced in youth workshops.' },
+                { id: 'tuesday-1430', name: 'Brian Ochieng', email: 'brian.o@gmail.com', phone: '+254 722 334 455', role: 'Peer engagement', interviewer: 'Michael Omondi', notes: 'Prefers Zoom. Organizes campus health networks.' },
+                { id: 'tuesday-1500', name: 'Joy Nyambura', email: 'j.nyambura@ku.ac.ke', phone: '+254 733 445 566', role: 'Comms', interviewer: 'Grace Muthoni', notes: 'Prefers Google Meet. Social media management bg.' },
+                { id: 'tuesday-1630', name: 'Samuel Mutua', email: 's.mutua@outlook.com', phone: '+254 744 556 677', role: 'Events', interviewer: null, notes: 'Prefers Zoom. Needs interviewer assignment.' },
+                
+                { id: 'wednesday-1400', name: 'Amina Hassan', email: 'a.hassan@daystar.ac.ke', phone: '+254 755 667 788', role: 'Research', interviewer: 'Alex Kioko', notes: 'Prefers Google Meet. Qualitative data lead.' },
+                { id: 'wednesday-1500', name: 'Dennis Kimani', email: 'dkimani@yahoo.com', phone: '+254 766 778 899', role: 'IT', interviewer: null, notes: 'Prefers Zoom. Needs interviewer assignment.' },
+                { id: 'wednesday-1600', name: 'Cynthia Cherono', email: 'c.cherono@egerton.ac.ke', phone: '+254 777 889 900', role: 'Monitoring and Evaluation', interviewer: 'Dr. Sarah Wanjiku', notes: 'Prefers Google Meet.' },
+
+                { id: 'thursday-0900', name: 'Kevin Wambua', email: 'kwambua@strathmore.edu', phone: '+254 788 990 011', role: 'Training Dpt', interviewer: 'Michael Omondi', notes: 'Prefers Zoom. Training facilitator.' },
+                { id: 'thursday-1000', name: 'Esther Adhiambo', email: 'esther.a@gmail.com', phone: '+254 799 001 122', role: 'Partnerships', interviewer: 'Grace Muthoni', notes: 'Prefers Google Meet.' },
+                { id: 'thursday-1100', name: 'Peter Njoroge', email: 'p.njoroge@mku.ac.ke', phone: '+254 700 112 233', role: 'Facilitating Sessions', interviewer: null, notes: 'Needs interviewer assignment.' },
+                { id: 'thursday-1330', name: 'Anita Nduta', email: 'a.nduta@jkuat.ac.ke', phone: '+254 712 233 445', role: 'Comms', interviewer: 'Alex Kioko', notes: 'Prefers Google Meet.' },
+                { id: 'thursday-1430', name: 'Victor Otieno', email: 'v.otieno@gmail.com', phone: '+254 723 344 556', role: 'Peer engagement', interviewer: 'Dr. Sarah Wanjiku', notes: 'Prefers Zoom.' }
+            ];
+
+            sampleBookings.forEach(booking => {
+                if (state[booking.id]) {
+                    state[booking.id].isBooked = true;
+                    state[booking.id].candidate = {
+                        name: booking.name,
+                        email: booking.email,
+                        phone: booking.phone,
+                        role: booking.role,
+                        institution: 'Kenyan University Partner',
+                        notes: booking.notes,
+                        code: 'DAR-' + Math.floor(1000 + Math.random() * 9000)
+                    };
+                    state[booking.id].interviewer = booking.interviewer;
+                }
+            });
+
+            return state;
+        }
+
+        // Initialize State from localStorage or Seed
+        function initScheduleState() {
+            const saved = localStorage.getItem('daraja_interview_slots_v2');
+            if (saved) {
+                try {
+                    slotsState = JSON.parse(saved);
+                } catch(e) {
+                    slotsState = seedDemoData();
+                }
+            } else {
+                slotsState = seedDemoData();
+            }
+            saveState();
+        }
+
+        function saveState() {
+            localStorage.setItem('daraja_interview_slots_v2', JSON.stringify(slotsState));
+            updateKPICounters();
+            renderWorkloadChart();
+        }
+
+        function resetScheduleDemo() {
+            localStorage.removeItem('daraja_interview_slots_v2');
+            slotsState = seedDemoData();
+            saveState();
+            renderApplicantSlots();
+            renderAdminScheduleMatrix();
+            renderUnassignedList();
+            showToast("Schedule reset to initial demo dataset!");
+        }
+
+        // TAB / VIEW SWITCHING
+        function switchView(viewName) {
+            const applicantSec = document.getElementById('view-applicant');
+            const adminSec = document.getElementById('view-admin');
+            const btnApp = document.getElementById('btn-view-applicant');
+            const btnAdm = document.getElementById('btn-view-admin');
+
+            if (viewName === 'applicant') {
+                applicantSec.classList.remove('hidden');
+                adminSec.classList.add('hidden');
+                
+                btnApp.className = "flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white text-brand-700 shadow-sm font-semibold";
+                btnAdm.className = "flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-stone-600 hover:text-slate-900 font-semibold";
+                renderApplicantSlots();
+            } else {
+                applicantSec.classList.add('hidden');
+                adminSec.classList.remove('hidden');
+
+                btnAdm.className = "flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white text-brand-700 shadow-sm font-semibold";
+                btnApp.className = "flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-stone-600 hover:text-slate-900 font-semibold";
+                renderAdminScheduleMatrix();
+                renderUnassignedList();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // APPLICANT VIEW FUNCTIONS
+        function selectApplicantDay(day) {
+            selectedApplicantDay = day;
+            selectedApplicantSlotId = null;
+
+            // Update Tab UI
+            ['Tuesday', 'Wednesday', 'Thursday'].forEach(d => {
+                const tab = document.getElementById(`tab-day-${d.toLowerCase()}`);
+                if (d === day) {
+                    tab.className = "py-2.5 rounded-lg transition bg-white text-brand-700 shadow-sm border border-stone-200 font-bold";
+                } else {
+                    tab.className = "py-2.5 rounded-lg transition text-stone-600 hover:text-slate-900 font-semibold";
+                }
+            });
+
+            document.getElementById('applicant-selected-day-label').innerText = `${day} Available 30-Min Slots`;
+            updateSelectedSlotBanner();
+            renderApplicantSlots();
+        }
+
+        function renderApplicantSlots() {
+            const grid = document.getElementById('applicant-slots-grid');
+            grid.innerHTML = '';
+
+            const daySlots = Object.values(slotsState).filter(s => s.day === selectedApplicantDay);
+
+            daySlots.forEach(slot => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+
+                if (slot.isBooked) {
+                    // Filled slot
+                    btn.disabled = true;
+                    btn.className = "p-2.5 rounded-xl border border-rose-200 bg-rose-50/60 text-rose-400 text-xs font-semibold cursor-not-allowed flex flex-col items-center justify-center space-y-1 relative opacity-75";
+                    btn.innerHTML = `
+                        <span>${slot.startTime}</span>
+                        <span class="text-[9px] bg-rose-200 text-rose-800 px-1.5 py-0.2 rounded font-bold uppercase">Filled</span>
+                    `;
+                } else {
+                    // Available slot
+                    const isSelected = selectedApplicantSlotId === slot.id;
+                    if (isSelected) {
+                        btn.className = "p-2.5 rounded-xl border-2 border-brand-600 bg-brand-600 text-white text-xs font-bold shadow flex flex-col items-center justify-center space-y-1 transform scale-105 transition-all";
+                    } else {
+                        btn.className = "p-2.5 rounded-xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-100 text-emerald-900 text-xs font-bold flex flex-col items-center justify-center space-y-1 transition hover:shadow-sm";
+                    }
+
+                    btn.onclick = () => {
+                        selectedApplicantSlotId = slot.id;
+                        renderApplicantSlots();
+                        updateSelectedSlotBanner();
+                    };
+
+                    btn.innerHTML = `
+                        <span>${slot.startTime}</span>
+                        <span class="text-[9px] ${isSelected ? 'bg-brand-800 text-white' : 'bg-emerald-200 text-emerald-800'} px-1.5 py-0.2 rounded font-bold uppercase">${isSelected ? 'Selected' : 'Available'}</span>
+                    `;
+                }
+
+                grid.appendChild(btn);
+            });
+        }
+
+        function updateSelectedSlotBanner() {
+            const bannerTime = document.getElementById('banner-slot-time');
+            const bannerDate = document.getElementById('banner-slot-date');
+            const submitBtn = document.getElementById('btn-submit-booking');
+
+            if (selectedApplicantSlotId && slotsState[selectedApplicantSlotId]) {
+                const slot = slotsState[selectedApplicantSlotId];
+                bannerTime.innerText = `${slot.day} @ ${slot.timeRange}`;
+                bannerDate.innerText = `Selected 30-minute interview slot`;
+                submitBtn.disabled = false;
+                submitBtn.className = "w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl transition shadow text-xs cursor-pointer";
+            } else {
+                bannerTime.innerText = "No slot selected";
+                bannerDate.innerText = `Click an available green slot above`;
+                submitBtn.disabled = true;
+                submitBtn.className = "w-full bg-stone-300 text-stone-500 font-bold py-3 rounded-xl transition text-xs cursor-not-allowed";
+            }
+        }
+
+        function handleApplicantBooking(e) {
+            e.preventDefault();
+            if (!selectedApplicantSlotId || !slotsState[selectedApplicantSlotId]) {
+                showToast("Please select a slot first!");
+                return;
+            }
+
+            const name = document.getElementById('applicant-name').value;
+            const email = document.getElementById('applicant-email').value;
+            const phone = document.getElementById('applicant-phone').value;
+            const role = document.getElementById('applicant-role').value;
+            const inst = document.getElementById('applicant-institution').value || 'N/A';
+            const notes = document.getElementById('applicant-notes').value || 'None';
+            const code = 'DAR-' + Math.floor(1000 + Math.random() * 9000);
+
+            // Update slot state
+            const slot = slotsState[selectedApplicantSlotId];
+            slot.isBooked = true;
+            slot.candidate = {
+                name: name,
+                email: email,
+                phone: phone,
+                role: role,
+                institution: inst,
+                notes: notes,
+                code: code
+            };
+            slot.interviewer = null; // Unassigned initially so admin can delegate!
+
+            saveState();
+
+            lastCreatedBooking = slot;
+
+            // Reset form
+            document.getElementById('applicant-form').reset();
+            selectedApplicantSlotId = null;
+
+            // Show confirmation modal
+            document.getElementById('success-name').innerText = name;
+            document.getElementById('success-time').innerText = `${slot.day}, ${slot.timeRange}`;
+            document.getElementById('success-code').innerText = code;
+            document.getElementById('booking-success-modal').classList.remove('hidden');
+
+            renderApplicantSlots();
+            updateSelectedSlotBanner();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('booking-success-modal').classList.add('hidden');
+        }
+
+
+        // ADMIN & INTERVIEWER HUB FUNCTIONS
+        function renderAdminScheduleMatrix() {
+            const tueContainer = document.getElementById('matrix-tuesday-container');
+            const wedContainer = document.getElementById('matrix-wednesday-container');
+            const thuContainer = document.getElementById('matrix-thursday-container');
+            const filterInterviewer = document.getElementById('admin-interviewer-filter').value;
+
+            tueContainer.innerHTML = '';
+            wedContainer.innerHTML = '';
+            thuContainer.innerHTML = '';
+
+            const slots = Object.values(slotsState);
+
+            slots.forEach(slot => {
+                // Apply filter
+                if (filterInterviewer !== 'all') {
+                    if (filterInterviewer === 'Unassigned') {
+                        if (!slot.isBooked || slot.interviewer !== null) return;
+                    } else {
+                        if (!slot.isBooked || slot.interviewer !== filterInterviewer) return;
+                    }
+                }
+
+                if (currentAdminFilter === 'unassigned' && (!slot.isBooked || slot.interviewer !== null)) {
+                    return;
+                }
+
+                const card = document.createElement('div');
+
+                if (!slot.isBooked) {
+                    // Empty available slot
+                    card.className = "p-2.5 rounded-lg border border-dashed border-stone-200 bg-stone-50/50 text-xs flex justify-between items-center text-stone-400";
+                    card.innerHTML = `
+                        <span class="font-mono text-[11px] font-medium">${slot.startTime}</span>
+                        <span class="text-[10px] text-stone-400">Available</span>
+                    `;
+                } else {
+                    // Booked Candidate Slot
+                    const candidate = slot.candidate;
+                    const isUnassigned = !slot.interviewer;
+
+                    card.className = `p-3 rounded-xl border text-xs space-y-2 cursor-pointer transition shadow-sm hover:shadow ${isUnassigned ? 'border-amber-300 bg-amber-50/40 hover:border-amber-400' : 'border-stone-200 bg-white hover:border-brand-400'}`;
+                    
+                    card.onclick = () => openDelegationModal(slot.id);
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <span class="font-bold text-slate-800 text-[11px] font-mono bg-stone-100 px-1.5 py-0.5 rounded">${slot.startTime}</span>
+                            <span class="text-[10px] ${isUnassigned ? 'bg-amber-200 text-amber-900' : 'bg-brand-100 text-brand-800'} px-2 py-0.5 rounded font-bold">
+                                ${isUnassigned ? '⚠️ Unassigned' : '✓ Assigned'}
+                            </span>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 block text-xs truncate">${candidate.name}</strong>
+                            <span class="text-[11px] text-stone-500 block truncate">${candidate.role}</span>
+                        </div>
+                        <div class="pt-1.5 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                            <span class="text-stone-500">Panel:</span>
+                            <span class="font-bold ${isUnassigned ? 'text-amber-700 italic' : 'text-brand-800'}">
+                                ${slot.interviewer ? slot.interviewer : 'Assign Interviewer →'}
+                            </span>
+                        </div>
+                    `;
+                }
+
+                if (slot.day === 'Tuesday') tueContainer.appendChild(card);
+                if (slot.day === 'Wednesday') wedContainer.appendChild(card);
+                if (slot.day === 'Thursday') thuContainer.appendChild(card);
+            });
+        }
+
+        function renderUnassignedList() {
+            const container = document.getElementById('unassigned-list-container');
+            container.innerHTML = '';
+
+            const unassignedSlots = Object.values(slotsState).filter(s => s.isBooked && !s.interviewer);
+
+            document.getElementById('pending-counter-pill').innerText = `${unassignedSlots.length} Needs Assignment`;
+            document.getElementById('badge-unassigned-count').innerText = unassignedSlots.length;
+
+            if (unassignedSlots.length === 0) {
+                container.innerHTML = `
+                    <div class="p-4 bg-emerald-50 text-emerald-800 text-xs rounded-xl text-center font-medium">
+                        ✓ All booked interviews have assigned interviewers!
+                    </div>
+                `;
+                return;
+            }
+
+            unassignedSlots.forEach(slot => {
+                const item = document.createElement('div');
+                item.className = "p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-xs space-y-2";
+                item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <strong class="text-slate-900 font-bold">${slot.candidate.name}</strong>
+                        <span class="text-[10px] font-bold text-amber-800 bg-amber-200 px-1.5 py-0.5 rounded">${slot.day} ${slot.startTime}</span>
+                    </div>
+                    <p class="text-[11px] text-stone-600 truncate">${slot.candidate.role} • ${slot.candidate.email}</p>
+                    <button onclick="openDelegationModal('${slot.id}')" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-1.5 rounded-lg text-[11px] transition">
+                        Delegate Interviewer
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // DELEGATION MODAL HANDLERS
+        function openDelegationModal(slotId) {
+            activeModalSlotId = slotId;
+            const slot = slotsState[slotId];
+            if (!slot || !slot.candidate) return;
+
+            document.getElementById('modal-candidate-name').innerText = slot.candidate.name;
+            document.getElementById('modal-candidate-meta').innerText = `${slot.candidate.role} • ${slot.candidate.email}`;
+            document.getElementById('modal-slot-time').innerText = `${slot.day} @ ${slot.timeRange}`;
+
+            // Fill interviewer dropdown
+            const select = document.getElementById('modal-interviewer-select');
+            select.innerHTML = '<option value="">-- Select Interviewer --</option>';
+            interviewers.forEach(intName => {
+                const opt = document.createElement('option');
+                opt.value = intName;
+                opt.innerText = intName;
+                if (slot.interviewer === intName) opt.selected = true;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('modal-internal-notes').value = slot.notes || '';
+            document.getElementById('delegation-modal').classList.remove('hidden');
+        }
+
+        function closeDelegationModal() {
+            document.getElementById('delegation-modal').classList.add('hidden');
+            activeModalSlotId = null;
+        }
+
+        function confirmModalDelegation() {
+            if (!activeModalSlotId || !slotsState[activeModalSlotId]) return;
+
+            const selectedInt = document.getElementById('modal-interviewer-select').value;
+            const notes = document.getElementById('modal-internal-notes').value;
+
+            slotsState[activeModalSlotId].interviewer = selectedInt || null;
+            slotsState[activeModalSlotId].notes = notes;
+
+            saveState();
+            closeDelegationModal();
+
+            renderAdminScheduleMatrix();
+            renderUnassignedList();
+            showToast(selectedInt ? `Assigned to ${selectedInt}` : "Interviewer unassigned.");
+        }
+
+        function addInterviewerTeamMember() {
+            const input = document.getElementById('new-interviewer-name');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (!interviewers.includes(name)) {
+                interviewers.push(name);
+                showToast(`Added ${name} to Interviewer Panel`);
+                input.value = '';
+                renderAdminScheduleMatrix();
+            }
+        }
+
+        function filterAdminCalendar(filterType) {
+            currentAdminFilter = filterType;
+            
+            document.querySelectorAll('.filter-admin-btn').forEach(btn => {
+                btn.className = "filter-admin-btn bg-stone-100 text-stone-700 hover:bg-stone-200 px-3 py-1.5 rounded-lg font-semibold transition";
+            });
+
+            if (filterType === 'all') {
+                document.getElementById('filter-btn-all').className = "filter-admin-btn bg-brand-600 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow-sm";
+            } else {
+                document.getElementById('filter-btn-unassigned').className = "filter-admin-btn bg-amber-500 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow-sm";
+            }
+
+            renderAdminScheduleMatrix();
+        }
+
+        // UPDATE KPI COUNTERS
+        function updateKPICounters() {
+            const allSlots = Object.values(slotsState);
+            const booked = allSlots.filter(s => s.isBooked);
+            const unassigned = booked.filter(s => !s.interviewer);
+
+            const pct = Math.round((booked.length / allSlots.length) * 100);
+
+            const bookedElem = document.getElementById('kpi-booked-count');
+            const pctElem = document.getElementById('kpi-booked-pct');
+            const unassignedElem = document.getElementById('kpi-unassigned-count');
+
+            if (bookedElem) bookedElem.innerText = `${booked.length} / ${allSlots.length}`;
+            if (pctElem) pctElem.innerText = `${pct}% Capacity Filled`;
+            if (unassignedElem) unassignedElem.innerText = `${unassigned.length} Candidates`;
+        }
+
+        // WORKLOAD CHART.JS VISUALIZATION
+        function renderWorkloadChart() {
+            const ctx = document.getElementById('workloadChart');
+            if (!ctx) return;
+
+            const counts = {};
+            interviewers.forEach(i => counts[i] = 0);
+            counts['Unassigned'] = 0;
+
+            Object.values(slotsState).forEach(s => {
+                if (s.isBooked) {
+                    if (s.interviewer) {
+                        counts[s.interviewer] = (counts[s.interviewer] || 0) + 1;
+                    } else {
+                        counts['Unassigned'] += 1;
+                    }
+                }
+            });
+
+            const labels = Object.keys(counts);
+            const dataVals = Object.values(counts);
+
+            if (workloadChartInstance) {
+                workloadChartInstance.destroy();
+            }
+
+            workloadChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataVals,
+                        backgroundColor: [
+                            '#0d9488',
+                            '#4f46e5',
+                            '#d97706',
+                            '#0284c7',
+                            '#f43f5e'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 10, font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ICS CALENDAR EXPORT GENERATOR
+        function downloadSingleICS() {
+            if (!lastCreatedBooking) return;
+
+            const slot = lastCreatedBooking;
+            const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Daraja Africa Network//Interview Portal//EN
+BEGIN:VEVENT
+SUMMARY:Daraja Interview - ${slot.candidate.role}
+DESCRIPTION:Candidate: ${slot.candidate.name}\\nPhone: ${slot.candidate.phone}\\nReference: ${slot.candidate.code}\\nNotes/Method: ${slot.candidate.notes}
+LOCATION:Daraja Online Portal / Zoom / Google Meet
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', `Daraja_Interview_${slot.candidate.code}.ics`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Calendar invite downloaded!");
+        }
+
+        function exportMasterCalendarICS() {
+            const booked = Object.values(slotsState).filter(s => s.isBooked);
+            if (booked.length === 0) {
+                showToast("No booked interviews to export.");
+                return;
+            }
+
+            let eventsStr = '';
+            booked.forEach(slot => {
+                eventsStr += `BEGIN:VEVENT
+SUMMARY:Interview: ${slot.candidate.name} (${slot.candidate.role})
+DESCRIPTION:Interviewer: ${slot.interviewer || 'Unassigned'}\\nEmail: ${slot.candidate.email}\\nNotes/Method: ${slot.candidate.notes || 'None'}
+STATUS:CONFIRMED
+END:VEVENT\n`;
+            });
+
+            const fullICS = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Daraja Africa Network//Master Schedule//EN
+${eventsStr}END:VCALENDAR`;
+
+            const blob = new Blob([fullICS], { type: 'text/calendar;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', `Daraja_Master_Schedule_2026.ics`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Master schedule calendar feed downloaded!");
+        }
+
+        // Toast Utility
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            if (!toast || !toastMsg) return;
+
+            toastMsg.innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // On DOM Content Loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initScheduleState();
+            selectApplicantDay('Tuesday');
+        });
+    </script>
+</body>
+</html>
