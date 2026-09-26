@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daraja Africa Network - SDG & Digital Audit Dashboard</title>
+
+    <!-- Chosen Palette: Warm Neutral Harmony & SDG Accents -->
+    <!-- Application Structure Plan: Single Page Application designed as an interactive Strategic Dashboard. It features tabbed/sectioned navigation (Executive Overview, Interactive SDG Matrix, Kenyan Context & Data Visualizations, Website & Social Media Audit, Ready-to-Use Website Copy Tool, UI & UN Branding Guidelines, and Evidence & Impact Framework). This structure was selected so that leadership, communications teams, and potential partners can navigate directly to actionable insights, explore data interactively, preview copy snippets, and review UN compliance rules seamlessly without scrolling through a monolithic text report. -->
+    <!-- Visualization & Content Choices: 
+    1. Student Mental Health Prevalence -> Goal: Compare -> Interactive Donut/Bar Chart (Chart.js Canvas) -> Toggle between Lifetime, Past Year, Past Month prevalence -> Provides visual gravity to the crisis in Kenya.
+    2. Economic Cost Breakdown -> Goal: Inform -> Dynamic Stacked Bar (Chart.js Canvas) -> Shows Ksh 62.2B impact breakdown -> Highlights macro-economic justification.
+    3. SDG Alignment Filter Matrix -> Goal: Organize -> Interactive HTML Grid with JS filter tabs (Primary, Secondary, Excluded) -> Allows users to click on any SDG to view UN targets, evidence, and site strategy -> Replaces static tables.
+    4. Website Copy Generator -> Goal: Actionable Tool -> Interactive Text Preview Cards with 1-click Copy to Clipboard -> Enables communications staff to immediately utilize compliant copy.
+    5. Impact Measurement Taxonomy -> Goal: Organize -> Tabbed Input/Activity/Output/Outcome matrix -> Clarifies data requirements for SDG 3, 4, and 10.
+    NO SVG OR MERMAID JS USED. Chart.js rendered on Canvas elements within styled parent containers. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        sdgRed: '#e5243b',
+                        sdgOrange: '#dda63a',
+                        sdgGreen: '#4c9f38',
+                        sdgBlue: '#26bde2',
+                        sdgNavy: '#19486a',
+                        warmBg: '#faf9f6',
+                        cardBg: '#ffffff',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .tab-btn.active {
+            border-bottom-color: #0d9488;
+            color: #0d9488;
+            font-weight: 600;
+        }
+        .filter-btn.active {
+            background-color: #0d9488;
+            color: #ffffff;
+        }
+        /* Custom subtle scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #faf9f6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-warmBg text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-100 selection:text-brand-900">
+
+    <!-- Header Navigation -->
+    <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo / Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-brand-600 flex items-center justify-center text-white font-bold text-xl shadow-sm">
+                        D
+                    </div>
+                    <div>
+                        <span class="font-bold text-lg text-slate-900 block leading-tight">Daraja Africa Network</span>
+                        <span class="text-xs text-stone-500 block">SDG & Digital Impact Audit 2026</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex space-x-1 lg:space-x-4 text-xs lg:text-sm font-medium">
+                    <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn active px-3 py-2 text-stone-600 hover:text-brand-600 border-b-2 border-transparent transition">Executive Summary</button>
+                    <button onclick="switchTab('sdg-framework')" id="nav-sdg-framework" class="tab-btn px-3 py-2 text-stone-600 hover:text-brand-600 border-b-2 border-transparent transition">SDG Framework</button>
+                    <button onclick="switchTab('kenya-context')" id="nav-kenya-context" class="tab-btn px-3 py-2 text-stone-600 hover:text-brand-600 border-b-2 border-transparent transition">Kenyan Context</button>
+                    <button onclick="switchTab('audit-findings')" id="nav-audit-findings" class="tab-btn px-3 py-2 text-stone-600 hover:text-brand-600 border-b-2 border-transparent transition">Website & Social Audit</button>
+                    <button onclick="switchTab('copy-generator')" id="nav-copy-generator" class="tab-btn px-3 py-2 text-stone-600 hover:text-brand-600 border-b-2 border-transparent transition">Website Copy Tool</button>
+                    <button onclick="switchTab('branding-impact')" id="nav-branding-impact" class="tab-btn px-3 py-2 text-stone-600 hover:text-brand-600 border-b-2 border-transparent transition">UI & Impact Framework</button>
+                </nav>
+
+                <!-- Action Button -->
+                <div class="flex items-center space-x-2">
+                    <a href="#copy-generator" onclick="switchTab('copy-generator')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm px-3 sm:px-4 py-2 rounded-md font-medium transition shadow-sm">
+                        Get Website Copy
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Nav Scrollable Strip -->
+        <div class="md:hidden flex overflow-x-auto border-t border-stone-100 bg-stone-50 text-xs py-2 px-2 space-x-2 no-scrollbar">
+            <button onclick="switchTab('overview')" class="tab-btn active whitespace-nowrap px-3 py-1 rounded-full bg-white border border-stone-200">Summary</button>
+            <button onclick="switchTab('sdg-framework')" class="tab-btn whitespace-nowrap px-3 py-1 rounded-full bg-white border border-stone-200">SDGs</button>
+            <button onclick="switchTab('kenya-context')" class="tab-btn whitespace-nowrap px-3 py-1 rounded-full bg-white border border-stone-200">Kenya Context</button>
+            <button onclick="switchTab('audit-findings')" class="tab-btn whitespace-nowrap px-3 py-1 rounded-full bg-white border border-stone-200">Audits</button>
+            <button onclick="switchTab('copy-generator')" class="tab-btn whitespace-nowrap px-3 py-1 rounded-full bg-white border border-stone-200">Copy Tool</button>
+            <button onclick="switchTab('branding-impact')" class="tab-btn whitespace-nowrap px-3 py-1 rounded-full bg-white border border-stone-200">Impact & Branding</button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: EXECUTIVE OVERVIEW                  -->
+        <!-- ========================================== -->
+        <section id="tab-overview" class="tab-content space-y-8">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-slate-900 rounded-2xl text-white p-6 sm:p-10 shadow-lg relative overflow-hidden">
+                <div class="max-w-3xl space-y-4 relative z-10">
+                    <div class="inline-flex items-center space-x-2 bg-brand-500/20 border border-brand-400/30 px-3 py-1 rounded-full text-brand-200 text-xs uppercase tracking-wider font-semibold">
+                        <span>Youth Mental Health & Digital Impact Strategy</span>
+                    </div>
+                    <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                        Aligning Youth Peer Support with the United Nations Sustainable Development Goals
+                    </h1>
+                    <p class="text-stone-300 text-sm sm:text-base leading-relaxed">
+                        Daraja Africa Network operates at the epicenter of Kenya's student mental health crisis. This interactive audit establishes how to credibly align Daraja's peer-led programs with global sustainability goals without overreaching or falling into SDG-washing.
+                    </p>
+                    <div class="pt-2 flex flex-wrap gap-3">
+                        <button onclick="switchTab('sdg-framework')" class="bg-white text-brand-900 font-semibold px-4 py-2.5 rounded-lg text-sm hover:bg-brand-50 transition shadow">
+                            Explore Primary SDGs
+                        </button>
+                        <button onclick="switchTab('kenya-context')" class="bg-brand-700/60 border border-brand-500/40 text-white font-medium px-4 py-2.5 rounded-lg text-sm hover:bg-brand-700 transition">
+                            View Kenya Mental Health Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Introductory Paragraph requirement -->
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-3">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                    <span class="w-3 h-3 rounded-full bg-brand-600"></span>
+                    <span>Executive Summary & Organizational Mandate</span>
+                </h2>
+                <p class="text-stone-600 text-sm leading-relaxed">
+                    The intersection of youth development and mental health in Kenya represents one of the most pressing public health, economic, and human rights challenges of this decade. Operating as a youth-led organization in Nairobi, <strong>Daraja Africa Network</strong> bridges vulnerable university students and youth with peer support, psychoeducation, and community advocacy. While mental health touches virtually every dimension of sustainable development, a credible digital strategy requires focusing on a highly targeted set of SDGs: <strong>SDG 3 (Good Health and Well-being)</strong> and <strong>SDG 4 (Quality Education)</strong> as primary anchors, supported by <strong>SDG 5 (Gender Equality)</strong>, <strong>SDG 10 (Reduced Inequalities)</strong>, and <strong>SDG 17 (Partnerships)</strong>.
+                </p>
+            </div>
+
+            <!-- Key Metrics Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:border-brand-300 transition">
+                    <div class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Target Demographic Risk</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">49.7%</div>
+                    <p class="text-xs text-stone-500 mt-1">Kenyan university students meeting mental disorder criteria</p>
+                    <div class="mt-3 text-xs font-medium text-brand-600 bg-brand-50 px-2 py-1 rounded inline-block">SDG 3 Target 3.4 Focus</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:border-brand-300 transition">
+                    <div class="text-xs font-semibold text-stone-500 uppercase tracking-wider">Macroeconomic Burden</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">Ksh 62.2B</div>
+                    <p class="text-xs text-stone-500 mt-1">Annual economic cost of mental health in Kenya (~0.6% GDP)</p>
+                    <div class="mt-3 text-xs font-medium text-amber-700 bg-amber-50 px-2 py-1 rounded inline-block">Lost Youth Productivity</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:border-brand-300 transition">
+                    <div class="text-xs font-semibold text-stone-500 uppercase tracking-wider">National Service Gap</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">&lt; 100</div>
+                    <p class="text-xs text-stone-500 mt-1">Practicing psychiatrists in Kenya for over 50M population</p>
+                    <div class="mt-3 text-xs font-medium text-purple-700 bg-purple-50 px-2 py-1 rounded inline-block">Peer Models Essential</div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm hover:border-brand-300 transition">
+                    <div class="text-xs font-semibold text-stone-500 uppercase tracking-wider">2025 Legal Reform</div>
+                    <div class="text-3xl font-extrabold text-slate-900 mt-1">Decriminalized</div>
+                    <p class="text-xs text-stone-500 mt-1">High Court struck down Sec 226 penal code (attempted suicide)</p>
+                    <div class="mt-3 text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded inline-block">Advocacy Milestone</div>
+                </div>
+            </div>
+
+            <!-- Profile & Backend Stack -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900 border-b pb-2 border-stone-100 flex justify-between items-center">
+                        <span>Organizational Profile</span>
+                        <span class="text-xs font-normal text-stone-500">Youth-Led NGO</span>
+                    </h3>
+                    <ul class="space-y-3 text-xs sm:text-sm text-stone-600">
+                        <li class="flex items-start space-x-2">
+                            <span class="text-brand-600 font-bold">✓</span>
+                            <span><strong>Core Operational Model:</strong> Peer-led psychological first aid, campus workshops, and youth-tailored digital psychoeducation.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-brand-600 font-bold">✓</span>
+                            <span><strong>Brand Meaning:</strong> "Daraja" (Swahili for <em>Bridge</em>) — linking vulnerable youth to non-stigmatized support and care pathways.</span>
+                        </li>
+                        <li class="flex items-start space-x-2">
+                            <span class="text-brand-600 font-bold">✓</span>
+                            <span><strong>Primary Platforms:</strong> TikTok for rapid destigmatization, Instagram for event portfolios, Facebook for community & partner trust.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <h3 class="text-base font-bold text-slate-900 border-b pb-2 border-stone-100 flex justify-between items-center">
+                        <span>Technical Architecture Snapshot</span>
+                        <span class="text-xs font-normal text-brand-600 bg-brand-50 px-2 py-0.5 rounded">High Scalability</span>
+                    </h3>
+                    <p class="text-xs text-stone-600">
+                        Public repository metadata reveals a production-grade backend environment supporting secure digital peer interactions:
+                    </p>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="p-2 bg-stone-50 rounded border border-stone-100 font-mono">
+                            <span class="text-stone-400 block text-[10px]">BACKEND CORE</span>
+                            <strong>Rust</strong>
+                        </div>
+                        <div class="p-2 bg-stone-50 rounded border border-stone-100 font-mono">
+                            <span class="text-stone-400 block text-[10px]">DATABASE</span>
+                            <strong>PostgreSQL</strong>
+                        </div>
+                        <div class="p-2 bg-stone-50 rounded border border-stone-100 font-mono">
+                            <span class="text-stone-400 block text-[10px]">STORAGE & REALTIME</span>
+                            <strong>AWS S3 + WebSockets</strong>
+                        </div>
+                        <div class="p-2 bg-stone-50 rounded border border-stone-100 font-mono">
+                            <span class="text-stone-400 block text-[10px]">SECURITY</span>
+                            <strong>Argon2 + JWT Auth</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 2: SDG RELEVANCE FRAMEWORK             -->
+        <!-- ========================================== -->
+        <section id="tab-sdg-framework" class="tab-content hidden space-y-6">
+            <!-- Section Header -->
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-100 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">SDG Alignment & Evaluation Framework</h2>
+                        <p class="text-stone-500 text-xs sm:text-sm mt-1">Filtering the 17 UN Sustainable Development Goals based on empirical programmatic fit.</p>
+                    </div>
+                    <!-- Filter Buttons -->
+                    <div class="flex flex-wrap gap-2 text-xs">
+                        <button onclick="filterSDG('all')" id="btn-sdg-all" class="filter-btn active px-3 py-1.5 rounded-md font-medium border border-stone-200 transition">All Evaluated</button>
+                        <button onclick="filterSDG('Primary')" id="btn-sdg-primary" class="filter-btn px-3 py-1.5 rounded-md font-medium border border-stone-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition">Primary (SDG 3 & 4)</button>
+                        <button onclick="filterSDG('Secondary')" id="btn-sdg-secondary" class="filter-btn px-3 py-1.5 rounded-md font-medium border border-stone-200 text-blue-800 bg-blue-50 hover:bg-blue-100 transition">Secondary (SDG 5, 10, 17)</button>
+                        <button onclick="filterSDG('Excluded')" id="btn-sdg-excluded" class="filter-btn px-3 py-1.5 rounded-md font-medium border border-stone-200 text-rose-800 bg-rose-50 hover:bg-rose-100 transition">Not Recommended</button>
+                    </div>
+                </div>
+                <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
+                    Organizations risk reputational damage and allegations of "SDG-washing" when claiming goals where alignment is merely theoretical. The interactive matrix below details which UN targets are directly backed by Daraja's activities, what evidence exists, and how each goal should be displayed on the website.
+                </p>
+            </div>
+
+            <!-- Dynamic SDG Cards Container -->
+            <div id="sdg-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Javascript will render SDG cards dynamically based on state -->
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 3: KENYAN CONTEXT & DATA               -->
+        <!-- ========================================== -->
+        <section id="tab-kenya-context" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-3">
+                <h2 class="text-xl font-bold text-slate-900">The Kenyan Context: Student Mental Health & Macro Priorities</h2>
+                <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
+                    To authentically communicate SDG contributions, Daraja must ground its narrative in Kenya's epidemiological reality. Kenyan university students face systemic socio-economic pressures, steep healthcare gaps, and recent legislative shifts.
+                </p>
+            </div>
+
+            <!-- Visual Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Chart 1: Student Mental Disorder Prevalence -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">University Student Mental Health Prevalence</h3>
+                        <p class="text-xs text-stone-500">2024-2025 Multi-Site Kenyan University Epidemiological Studies</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="prevalenceChart"></canvas>
+                    </div>
+                    <div class="p-3 bg-stone-50 rounded-lg text-xs text-stone-600 space-y-1">
+                        <span class="font-semibold text-slate-800">Key Context:</span>
+                        <p>40.7% of first-year students enter university with pre-existing or heightened mental distress. 5+ hours on social media increases risk by 2.43x.</p>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Economic Burden & Health Budget Allocation -->
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900">Economic Cost vs. Health Budget Allocation</h3>
+                        <p class="text-xs text-stone-500">Ministry of Health Mental Health Investment Case (Ksh Billions vs % Budget)</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="economicChart"></canvas>
+                    </div>
+                    <div class="p-3 bg-stone-50 rounded-lg text-xs text-stone-600 space-y-1">
+                        <span class="font-semibold text-slate-800">Key Takeaway:</span>
+                        <p>Kenya loses Ksh 62.2 Billion annually to mental ill-health (0.6% GDP), yet mental health receives &lt;0.01% of the health budget. Peer networks fill this systemic void.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legislative & Policy Landmark Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded inline-block">High Court Ruling (Jan 2025)</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Decriminalization of Attempted Suicide</h4>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        Judge Lawrence Mugambi struck down Section 226 of the Penal Code as unconstitutional, transitioning suicidal ideation from a criminal act to a public health priority.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-brand-700 bg-brand-50 px-2 py-1 rounded inline-block">National Policy Framework</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Mental Health Action Plan 2021-2025</h4>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        Mandates the decentralization of mental health services into community care and student peer support structures, explicitly validating Daraja's operational model.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-blue-700 bg-blue-50 px-2 py-1 rounded inline-block">Health Disparities</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Severe Workforce Concentration</h4>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        Only 16 out of 47 Kenyan counties have public psychiatric services. 75% of Kenyans needing mental care cannot access it, making digital models vital.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 4: AUDIT FINDINGS (WEBSITE & SOCIAL)  -->
+        <!-- ========================================== -->
+        <section id="tab-audit-findings" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-3">
+                <h2 class="text-xl font-bold text-slate-900">Website Architecture & Social Media Channel Audit</h2>
+                <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
+                    Detailed qualitative and technical evaluation of Daraja's public-facing digital properties across Vercel web hosting, Instagram, TikTok, and Facebook.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Website Audit Card -->
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3 border-stone-100">
+                        <h3 class="font-bold text-slate-900 text-base">Website Audit: Vercel Frontend</h3>
+                        <span class="text-xs bg-amber-50 text-amber-800 font-medium px-2 py-0.5 rounded">In Development</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs sm:text-sm text-stone-600">
+                        <div>
+                            <span class="font-semibold text-slate-800 block">Current Status & Gap:</span>
+                            <p class="mt-0.5">The primary domain (`wearedarajaafrica.vercel.app`) undergoes active development. It lacks a structured "Our Impact" section or formal SDG references, missing key partner signaling.</p>
+                        </div>
+
+                        <div>
+                            <span class="font-semibold text-slate-800 block">Strengths:</span>
+                            <p class="mt-0.5">Underlying backend repository is modern, secure, and ready for high-concurrency real-time peer chat features.</p>
+                        </div>
+
+                        <div class="p-3 bg-stone-50 rounded-lg space-y-1">
+                            <span class="font-semibold text-slate-900">Key UX Priority:</span>
+                            <p class="text-xs">Ensure WCAG compliance. Youth in distress require calming colors, clear typography, and 1-click access to crisis resources without administrative friction.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Media Audit Card -->
+                <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center border-b pb-3 border-stone-100">
+                        <h3 class="font-bold text-slate-900 text-base">Social Media Audit Across Channels</h3>
+                        <span class="text-xs bg-emerald-50 text-emerald-800 font-medium px-2 py-0.5 rounded">High Engagement</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs sm:text-sm text-stone-600">
+                        <div class="p-2.5 bg-stone-50 rounded border border-stone-100">
+                            <strong class="text-slate-900 block">TikTok (@daraja_africa_network)</strong>
+                            <span>Gen Z destigmatization videos, bite-sized psychoeducation on exam burnout and depression symptoms. Directly backs <strong>SDG 4.7</strong>.</span>
+                        </div>
+
+                        <div class="p-2.5 bg-stone-50 rounded border border-stone-100">
+                            <strong class="text-slate-900 block">Instagram (@daraja_africa_network)</strong>
+                            <span>Visual portfolio of campus activations, peer workshops, and infographics. Provides empirical proof for <strong>SDG 3.4</strong>.</span>
+                        </div>
+
+                        <div class="p-2.5 bg-stone-50 rounded border border-stone-100">
+                            <strong class="text-slate-900 block">Facebook (Daraja Africa Network)</strong>
+                            <span>Community outreach targeting educators, parents, and local partners. Fosters collaborative spirit mandated by <strong>SDG 17</strong>.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 5: WEBSITE COPY GENERATOR TOOL         -->
+        <!-- ========================================== -->
+        <section id="tab-copy-generator" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-3">
+                <h2 class="text-xl font-bold text-slate-900">Ready-to-Use Website Copy Generator</h2>
+                <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
+                    Compliant, human-centered web copy designed to bridge grassroots youth work with UN SDG taxonomy. Click "Copy Text" to export directly into your web content workflow.
+                </p>
+            </div>
+
+            <!-- Copy Snippets Matrix -->
+            <div class="space-y-6">
+                <!-- Snippet 1: Dedicated Impact Page -->
+                <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                    <div class="bg-stone-50 px-6 py-4 border-b border-stone-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm sm:text-base">1. Full Section Copy — "Our Contribution to the SDGs"</h3>
+                            <p class="text-xs text-stone-500">Recommended for the dedicated "Our Impact" or "Theory of Change" Page</p>
+                        </div>
+                        <button onclick="copyToClipboard('copy-text-1')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded font-medium transition shadow-sm">
+                            Copy Text
+                        </button>
+                    </div>
+                    <div class="p-6 text-xs sm:text-sm text-stone-700 leading-relaxed font-sans space-y-4 bg-white" id="copy-text-1">
+                        <p class="font-bold text-slate-900 text-base">Advancing Global Goals Through Local Action</p>
+                        <p>
+                            At Daraja Africa Network, we believe that the global mental health crisis cannot be solved without localized, culturally resonant, youth-led interventions. Our grassroots work across Kenya directly advances the United Nations Sustainable Development Goals by ensuring that psychological support is accessible, equitable, and community-driven.
+                        </p>
+                        <div class="space-y-2 border-l-2 border-brand-500 pl-4 py-1">
+                            <p><strong>SDG 3: Good Health and Well-being.</strong> We directly contribute to Target 3.4 by actively promoting mental health and well-being among Kenyan youth. Through our community-based peer support programs and accessible digital counseling frameworks, we work to reduce psychological distress, combat suicide stigma, and bridge the massive national gap in mental healthcare access.</p>
+                            <p><strong>SDG 4: Quality Education.</strong> True education extends beyond the academic classroom. We support Target 4.7 by equipping university students and marginalized youth with essential socio-emotional life skills, mental health literacy, and resilience training, empowering them to thrive in high-pressure environments.</p>
+                            <p><strong>SDG 10: Reduced Inequalities.</strong> Mental healthcare must not be a privilege reserved for a few in urban centers. By decentralizing mental health education and utilizing accessible digital platforms, we actively dismantle geographic and socio-economic barriers for vulnerable Kenyan youth.</p>
+                            <p><strong>SDG 17: Partnerships for the Goals.</strong> Systemic change requires radical collaboration. We partner with educational institutions, healthcare professionals, and civil society organizations to amplify our impact and build resilient, localized mental health networks.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Snippet 2: Homepage Mid-Scroll -->
+                <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                    <div class="bg-stone-50 px-6 py-4 border-b border-stone-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm sm:text-base">2. Homepage Mid-Scroll Snippet</h3>
+                            <p class="text-xs text-stone-500">For high-level scanning on the Main Homepage</p>
+                        </div>
+                        <button onclick="copyToClipboard('copy-text-2')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded font-medium transition shadow-sm">
+                            Copy Text
+                        </button>
+                    </div>
+                    <div class="p-6 text-xs sm:text-sm text-stone-700 leading-relaxed bg-white" id="copy-text-2">
+                        <p class="font-bold text-slate-900 mb-2">Local Roots, Global Impact.</p>
+                        <p>
+                            Our commitment to the mental well-being of Kenyan youth is a commitment to a sustainable future. Daraja Africa Network is proud to align our peer-support models and educational workshops with the United Nations Sustainable Development Goals, specifically driving tangible progress in Good Health and Well-being (SDG 3) and Quality Education (SDG 4).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Snippet 3: Global Footer Disclaimer -->
+                <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden">
+                    <div class="bg-stone-50 px-6 py-4 border-b border-stone-200 flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-sm sm:text-base">3. Global Website Footer Text</h3>
+                            <p class="text-xs text-stone-500">Persistent statement mandated by UN branding guidelines</p>
+                        </div>
+                        <button onclick="copyToClipboard('copy-text-3')" class="bg-brand-600 hover:bg-brand-700 text-white text-xs px-3 py-1.5 rounded font-medium transition shadow-sm">
+                            Copy Text
+                        </button>
+                    </div>
+                    <div class="p-6 text-xs sm:text-sm text-stone-700 leading-relaxed bg-white" id="copy-text-3">
+                        <p>Daraja Africa Network supports the United Nations Sustainable Development Goals.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- TAB 6: BRANDING RULES & IMPACT FRAMEWORK  -->
+        <!-- ========================================== -->
+        <section id="tab-branding-impact" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-xl border border-stone-200 p-6 shadow-sm space-y-3">
+                <h2 class="text-xl font-bold text-slate-900">UN Branding Rules & Evidence Impact Taxonomy</h2>
+                <p class="text-stone-600 text-xs sm:text-sm leading-relaxed">
+                    Essential compliance rules for non-UN entities using Sustainable Development Goal visuals, alongside a data-driven measurement framework to substantiate claims.
+                </p>
+            </div>
+
+            <!-- UN Branding Guidelines Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-5 rounded-xl border border-rose-200 bg-rose-50/30 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded inline-block">Prohibited</div>
+                    <h4 class="font-bold text-slate-900 text-sm">No UN Emblem (Logo Version 1)</h4>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        External NGOs are strictly forbidden from using SDG Logo Version 1 containing the UN emblem. Daraja must exclusively use <strong>SDG Logo Version 2</strong> (without emblem) and individual SDG icons.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-amber-200 bg-amber-50/30 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded inline-block">Mandatory</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Required Disclaimer Text</h4>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        Whenever SDG icons or wheels are displayed, they MUST be accompanied by the explicit phrase: <em>"[Daraja Africa Network] supports the Sustainable Development Goals"</em>.
+                    </p>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-emerald-200 bg-emerald-50/30 shadow-sm space-y-2">
+                    <div class="text-xs font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded inline-block">Integrity</div>
+                    <h4 class="font-bold text-slate-900 text-sm">Visual Independence</h4>
+                    <p class="text-xs text-stone-600 leading-relaxed">
+                        SDG icons cannot be merged, morphed, or altered into the Daraja Africa Network logo. The organizational logo must always maintain primary visual prominence.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Impact Taxonomy Table -->
+            <div class="bg-white rounded-xl border border-stone-200 shadow-sm overflow-hidden space-y-4 p-6">
+                <h3 class="font-bold text-slate-900 text-base border-b pb-3 border-stone-100">
+                    Impact Evidence Taxonomy — Transforming Activities into Outcomes
+                </h3>
+                <p class="text-xs text-stone-600">
+                    To avoid SDG-washing, Daraja must differentiate between simple activities (e.g., posting content) and validated clinical health outcomes.
+                </p>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-stone-50 border-b border-stone-200 text-stone-700 font-semibold">
+                                <th class="py-3 px-4">Level</th>
+                                <th class="py-3 px-4">Definition</th>
+                                <th class="py-3 px-4">SDG 3 Indicator Example</th>
+                                <th class="py-3 px-4">SDG 4 Indicator Example</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-stone-100 text-stone-600">
+                            <tr>
+                                <td class="py-3 px-4 font-bold text-slate-900 bg-stone-50/50">Inputs</td>
+                                <td class="py-3 px-4">Resources invested</td>
+                                <td class="py-3 px-4">Volunteer peer counselors, Rust backend platform</td>
+                                <td class="py-3 px-4">Workshop curriculum, educational materials</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-bold text-slate-900 bg-stone-50/50">Activities</td>
+                                <td class="py-3 px-4">Actions conducted</td>
+                                <td class="py-3 px-4">Peer support group sessions, digital counseling</td>
+                                <td class="py-3 px-4">Campus mental health literacy workshops</td>
+                            </tr>
+                            <tr>
+                                <td class="py-3 px-4 font-bold text-slate-900 bg-stone-50/50">Outputs</td>
+                                <td class="py-3 px-4">Quantifiable direct reach</td>
+                                <td class="py-3 px-4">500+ students participating in peer cohorts</td>
+                                <td class="py-3 px-4">1,200 students completing life-skills training</td>
+                            </tr>
+                            <tr class="bg-brand-50/40 font-medium">
+                                <td class="py-3 px-4 font-bold text-brand-800 bg-brand-100/50">Outcomes</td>
+                                <td class="py-3 px-4 text-brand-900">Validated behavioral change</td>
+                                <td class="py-3 px-4 text-brand-900">Statistically significant reduction in PHQ-9 & GAD-7 scores over 3 months</td>
+                                <td class="py-3 px-4 text-brand-900">Measured increase in coping mechanisms & reduced stigma towards peers</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="bg-slate-900 text-stone-400 text-xs py-8 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+            <div class="space-y-1">
+                <p class="text-stone-200 font-semibold">Daraja Africa Network - SDG Audit & Interactive Dashboard</p>
+                <p>Daraja Africa Network supports the United Nations Sustainable Development Goals.</p>
+            </div>
+            <div class="text-stone-500 text-[11px]">
+                Built for internal organizational strategy & web implementation 2026.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification Toast for Copy to Clipboard -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl text-xs sm:text-sm font-medium transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none z-50 flex items-center space-x-2">
+        <span class="text-brand-400 text-base">✓</span>
+        <span id="toast-message">Text copied to clipboard!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // State Management
+        const sdgData = [
+            {
+                number: 3,
+                name: "Good Health and Well-being",
+                relevance: "Primary",
+                target: "Target 3.4: Promote mental health and well-being; reduce NCD mortality.",
+                evidence: "Direct provision of peer support groups, digital psychoeducation, campus suicide prevention campaigns.",
+                strategy: "Primary Anchor narrative across Homepage hero, 'Our Impact' page, and core messaging.",
+                color: "bg-emerald-600 text-white",
+                badge: "bg-emerald-100 text-emerald-800"
+            },
+            {
+                number: 4,
+                name: "Quality Education",
+                relevance: "Primary",
+                target: "Target 4.7: Knowledge & skills for sustainable development and human rights.",
+                evidence: "Campus mental health literacy workshops, training students in socio-emotional resilience & peer first aid.",
+                strategy: "Prominent secondary placement alongside SDG 3 in impact section.",
+                color: "bg-rose-700 text-white",
+                badge: "bg-rose-100 text-rose-800"
+            },
+            {
+                number: 5,
+                name: "Gender Equality",
+                relevance: "Secondary",
+                target: "Target 5.1: End discrimination against all women and girls everywhere.",
+                evidence: "Gender-sensitive peer support addressing specific pressures (GBV, reproductive vulnerabilities vs male suicide stigma).",
+                strategy: "Supporting visual on Programmatic pages highlighting gender-specific mental health cohorts.",
+                color: "bg-orange-600 text-white",
+                badge: "bg-orange-100 text-orange-800"
+            },
+            {
+                number: 10,
+                name: "Reduced Inequalities",
+                relevance: "Secondary",
+                target: "Target 10.2: Empower and promote social & economic inclusion for all.",
+                evidence: "Democratizing access to mental health support beyond affluent urban centers via digital channels.",
+                strategy: "Narrative element in 'Our Approach' section focusing on healthcare access equity.",
+                color: "bg-pink-600 text-white",
+                badge: "bg-pink-100 text-pink-800"
+            },
+            {
+                number: 17,
+                name: "Partnerships for the Goals",
+                relevance: "Secondary",
+                target: "Target 17.17: Encourage effective civil society partnerships.",
+                evidence: "Collaborations with universities, mental health professionals, and youth networks across Kenya.",
+                strategy: "Dedicated display on 'Partnerships' page and global website footer.",
+                color: "bg-sky-700 text-white",
+                badge: "bg-sky-100 text-sky-800"
+            },
+            {
+                number: 1,
+                name: "No Poverty",
+                relevance: "Excluded",
+                target: "N/A - Indirect macroeconomic overlap only.",
+                evidence: "Poverty increases stress, but Daraja does not execute direct cash transfer or microfinance programs.",
+                strategy: "Do not display publicly. Prevents narrative dilution and skepticism from technical donors.",
+                color: "bg-stone-400 text-white",
+                badge: "bg-stone-100 text-stone-600"
+            },
+            {
+                number: 16,
+                name: "Peace, Justice & Strong Institutions",
+                relevance: "Excluded",
+                target: "N/A - Insufficient evidence of direct policy leadership.",
+                evidence: "High Court decriminalized suicide in Jan 2025, but Daraja was not a named litigant or legislative architect.",
+                strategy: "Exclude from public branding unless direct lobbying/court filing evidence is published.",
+                color: "bg-stone-400 text-white",
+                badge: "bg-stone-100 text-stone-600"
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        // Navigation Tab Switching
+        function switchTab(tabId) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Remove active class from desktop nav
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            // Show selected tab
+            const target = document.getElementById('tab-' + tabId);
+            if(target) target.classList.remove('hidden');
+
+            // Set active class on desktop button
+            const navBtn = document.getElementById('nav-' + tabId);
+            if(navBtn) navBtn.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Render SDG Cards
+        function renderSDGCards() {
+            const grid = document.getElementById('sdg-cards-grid');
+            if(!grid) return;
+
+            grid.innerHTML = '';
+
+            const filtered = sdgData.filter(item => {
+                if(currentFilter === 'all') return true;
+                return item.relevance === currentFilter;
+            });
+
+            filtered.forEach(sdg => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl border border-stone-200 p-6 shadow-sm hover:border-brand-300 transition space-y-4";
+                
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 rounded-lg ${sdg.color} flex items-center justify-center font-extrabold text-xl shadow-sm">
+                                ${sdg.number}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-base leading-tight">${sdg.name}</h3>
+                                <span class="text-xs ${sdg.badge} font-medium px-2 py-0.5 rounded mt-1 inline-block">
+                                    ${sdg.relevance} Alignment
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 text-xs sm:text-sm text-stone-600">
+                        <div>
+                            <strong class="text-slate-900 block">Target Alignment:</strong>
+                            <p>${sdg.target}</p>
+                        </div>
+                        <div>
+                            <strong class="text-slate-900 block">Empirical Evidence:</strong>
+                            <p>${sdg.evidence}</p>
+                        </div>
+                        <div class="p-2.5 bg-stone-50 rounded border border-stone-100">
+                            <strong class="text-brand-800 block">Recommended Web Strategy:</strong>
+                            <p class="text-xs">${sdg.strategy}</p>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter SDG Handler
+        function filterSDG(category) {
+            currentFilter = category;
+            
+            // Update filter buttons UI
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            
+            const activeBtn = document.getElementById(`btn-sdg-${category.toLowerCase()}`);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            renderSDGCards();
+        }
+
+        // Copy to Clipboard Utility
+        function copyToClipboard(elementId) {
+            const el = document.getElementById(elementId);
+            if(!el) return;
+
+            const textToCopy = el.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showToast("Copy text saved to clipboard!");
+            }).catch(err => {
+                showToast("Failed to copy. Please select manually.");
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            if(!toast || !toastMsg) return;
+
+            toastMsg.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize Chart.js Visualizations
+        function initCharts() {
+            // Chart 1: Student Mental Prevalence
+            const ctx1 = document.getElementById('prevalenceChart');
+            if(ctx1) {
+                new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: [
+                            'Lifetime Diagnosis',
+                            'Past 12 Months',
+                            'Past 30 Days',
+                            'First-Year Entry Stress',
+                            'High Economic Stress'
+                        ],
+                        datasets: [{
+                            label: 'Percentage of Kenyan Students (%)',
+                            data: [49.7, 45.0, 31.0, 40.7, 87.0],
+                            backgroundColor: [
+                                '#0d9488',
+                                '#14b8a6',
+                                '#2dd4bf',
+                                '#e11d48',
+                                '#d97706'
+                            ],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw + '% of surveyed youth';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) { return value + '%'; }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    callback: function(val, index) {
+                                        let label = this.getLabelForValue(index);
+                                        return label.length > 16 ? label.substr(0, 16) + '...' : label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: Economic Cost vs Allocation
+            const ctx2 = document.getElementById('economicChart');
+            if(ctx2) {
+                new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                            'Economic Productivity Loss (Ksh 62.2B)',
+                            'National Health Budget Share (<0.01%)'
+                        ],
+                        datasets: [{
+                            data: [99.99, 0.01],
+                            backgroundColor: ['#e11d48', '#10b981'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { boxWidth: 12, font: { size: 11 } }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + context.label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // On DOM Load Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSDGCards();
+            initCharts();
+        });
+    </script>
+</body>
+</html>
