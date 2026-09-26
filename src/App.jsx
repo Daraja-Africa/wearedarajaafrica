@@ -21,6 +21,7 @@ const Announcements = lazy(() => import("./pages/Announcements"));
 const ThePit = lazy(() => import("./pages/ThePit"));
 const PrivacyCharter = lazy(() => import("./pages/PrivacyCharter"));
 const DataDeletion = lazy(() => import("./pages/DataDeletion"));
+const InterviewScheduler = lazy(() => import("./pages/InterviewScheduler"));
 
 function App() {
   return (
@@ -38,6 +39,16 @@ function App() {
             }
           />
           <Route element={<MainLayout />}>
+            <Route
+              path="/schedule"
+              element={
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingSkeleton />}>
+                    <InterviewScheduler />
+                  </Suspense>
+                </ErrorBoundary>
+              }
+            />
             <Route
               path="/"
               element={
