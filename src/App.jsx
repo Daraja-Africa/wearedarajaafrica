@@ -15,6 +15,7 @@ const Programs = lazy(() => import("./pages/Programs"));
 const Resources = lazy(() => import("./pages/Resources"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const GetInvolved = lazy(() => import("./pages/GetInvolved"));
+const OurImpact = lazy(() => import("./pages/OurImpact"));
 const GetHelp = lazy(() => import("./pages/GetHelp"));
 const Announcements = lazy(() => import("./pages/Announcements"));
 const ThePit = lazy(() => import("./pages/ThePit"));
@@ -93,6 +94,16 @@ function App() {
                 <ErrorBoundary>
                   <Suspense fallback={<LoadingSkeleton />}>
                     <GetInvolved />
+                  </Suspense>
+                </ErrorBoundary>
+              }
+            />
+            <Route
+              path="/our-impact"
+              element={
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingSkeleton />}>
+                    <OurImpact />
                   </Suspense>
                 </ErrorBoundary>
               }
