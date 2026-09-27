@@ -11,6 +11,11 @@ const nextTuesday = () => {
   date.setDate(date.getDate() + offset);
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
+const tuesdayStart = (dateValue) => {
+  const date = new Date(`${dateValue}T12:00:00`);
+  date.setDate(date.getDate() - ((date.getDay() + 5) % 7));
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+};
 const formatTime = (time) => new Date(`1970-01-01T${time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 const formatDate = (date) => new Date(`${date}T12:00:00`).toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 const describeError = (error) => {
@@ -38,6 +43,7 @@ export default function InterviewScheduler() {
   const [day, setDay] = useState(2);
   const [slots, setSlots] = useState([]);
   const [interviewers, setInterviewers] = useState([]);
+  const [interviewer, setInterviewer] = useState(null);
   const [session, setSession] = useState(null);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [form, setForm] = useState({ full_name: '', email: '', phone: '', institution: '', role: '', interview_preferences: '' });
@@ -67,11 +73,28 @@ export default function InterviewScheduler() {
     return () => listener.subscription.unsubscribe();
   }, []);
   useEffect(() => {
-    if (!session) return;
-    supabase.from('interviewers').select('id,full_name,email').eq('active', true).order('full_name').then(({ data }) => setInterviewers(data || []));
+    if (!session?.user?.email) {
+      setInterviewer(null);
+      setInterviewers([]);
+      return;
+    }
+    supabase.from('interviewers').select('id,full_name,email').eq('active', true).order('full_name').then(({ data, error: interviewerError }) => {
+      if (interviewerError) {
+        setError(describeError(interviewerError));
+        setInterviewer(null);
+        return;
+      }
+      const activeInterviewer = (data || []).find((person) => person.email?.toLowerCase() === session.user.email.toLowerCase()) || null;
+      setInterviewer(activeInterviewer);
+      setInterviewers(data || []);
+      if (!activeInterviewer) setError('This account is not an active interviewer.');
+    });
   }, [session]);
+  useEffect(() => {
+    if (interviewer) loadSlots();
+  }, [interviewer, loadSlots]);
 
-  const visibleSlots = useMemo(() => slots.filter((slot) => slot.weekday === day), [slots, day]);
+  const visibleSlots = useMemo(() => slots.filter((slot) => slot.weekday === day && slot.status === 'available'), [slots, day]);
   const assignedCount = slots.filter((slot) => slot.status === 'assigned').length;
   const bookedCount = slots.filter((slot) => slot.status === 'booked').length;
 
@@ -94,16 +117,20 @@ export default function InterviewScheduler() {
       p_role: form.role,
       p_interview_preferences: form.interview_preferences || null,
     });
-    if (bookingError) return setError(bookingError.message);
-    const booked = { ...data[0], ...form };
+    if (bookingError) return setError(describeError(bookingError));
+    const bookedRow = Array.isArray(data) ? data[0] : data;
+    if (!bookedRow) return setError('The booking service did not return a confirmation. Please try again.');
+    const booked = { ...bookedRow, ...form };
     setConfirmed({ slot: booked, applicant: form });
     const { error: emailError } = await supabase.functions.invoke('send-interview-confirmation', { body: { applicant: form, slot: booked } });
     setMessage(`Confirmed for ${formatDate(booked.slot_date)} at ${formatTime(booked.starts_at)}.${emailError ? ' Save a calendar invite below; email delivery needs administrator configuration.' : ' A confirmation email with a calendar attachment has been sent.'}`);
     setSelectedSlot(null); setForm({ full_name: '', email: '', phone: '', institution: '', role: '', interview_preferences: '' }); loadSlots();
   };
-  const assign = async (slotId, interviewerId) => {
-    const { error: assignError } = await supabase.rpc('assign_interviewer', { p_slot_id: slotId, p_interviewer_id: interviewerId });
-    if (assignError) setError(assignError.message); else loadSlots();
+  const claim = async (slotId) => {
+    setError('');
+    const { error: claimError } = await supabase.rpc('claim_interview_slot', { p_slot_id: slotId });
+    if (claimError) setError(describeError(claimError));
+    await loadSlots();
   };
   const drawChart = async () => {
     if (!chartRef.current || !session) return;
@@ -129,14 +156,14 @@ export default function InterviewScheduler() {
       {confirmed && <div className="flex flex-wrap items-center gap-3 rounded-xl border border-brand-cream-light bg-brand-card p-4 text-sm"><strong>Calendar:</strong><a className="inline-flex items-center gap-2 rounded-lg bg-brand-charcoal px-3 py-2 font-semibold text-white" href={calendarLinks(confirmed.slot, confirmed.applicant).google} target="_blank" rel="noreferrer"><CalendarDays className="h-4 w-4" />Add to Google Calendar</a><button className="inline-flex items-center gap-2 rounded-lg border border-brand-cream-light bg-white px-3 py-2 font-semibold" onClick={() => { const blob = new Blob([calendarLinks(confirmed.slot, confirmed.applicant).ics], { type: 'text/calendar;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'daraja-interview.ics'; link.click(); URL.revokeObjectURL(url); }}><Download className="h-4 w-4" />Download .ics</button></div>}
       <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
         <div className="rounded-3xl border border-brand-cream-light bg-brand-card p-5 sm:p-7">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Step 1</p><h2 className="text-2xl font-bold">Choose a live slot</h2></div><input type="date" value={weekStart} onChange={(event) => setWeekStart(event.target.value)} className="rounded-lg border border-brand-cream-light bg-white px-3 py-2 text-sm" /></div>
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Step 1</p><h2 className="text-2xl font-bold">Choose a live slot</h2></div><input type="date" value={weekStart} onChange={(event) => setWeekStart(tuesdayStart(event.target.value))} className="rounded-lg border border-brand-cream-light bg-white px-3 py-2 text-sm" /></div>
           <div className="mb-5 grid grid-cols-3 gap-2">{WEEKDAYS.map((item) => <button key={item.day} onClick={() => setDay(item.day)} className={`rounded-xl border p-3 text-left ${day === item.day ? 'border-brand-gold bg-brand-cta-surface' : 'border-brand-cream-light bg-white'}`}><p className="font-bold">{item.label}</p><p className="text-xs text-brand-body">{item.hours}</p></button>)}</div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{visibleSlots.map((slot) => <button key={slot.id} disabled={slot.status !== 'available'} onClick={() => setSelectedSlot(slot)} className={`rounded-xl border p-3 text-left transition ${selectedSlot?.id === slot.id ? 'border-brand-gold bg-brand-gold text-white' : slot.status === 'available' ? 'border-green-200 bg-green-50 hover:border-brand-forest' : 'cursor-not-allowed border-stone-200 bg-stone-100 text-stone-700'}`}><Clock3 className="mb-2 h-4 w-4" /><p className="font-bold">{formatTime(slot.starts_at)}</p><p className="text-xs">{slot.status === 'available' ? 'Available' : 'Booked'}</p></button>)}</div>
           {loading && <p className="mt-4 text-sm text-brand-body">Loading live availability…</p>}
         </div>
         <form onSubmit={book} className="rounded-3xl border border-brand-cream-light bg-brand-card p-5 sm:p-7"><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Step 2</p><h2 className="mb-1 text-2xl font-bold">Applicant details</h2><p className="mb-5 text-sm text-brand-body">{selectedSlot ? `${formatDate(selectedSlot.slot_date)} · ${formatTime(selectedSlot.starts_at)}` : 'Select a green slot to continue.'}</p><div className="space-y-3">{[['full_name', 'Full name'], ['email', 'Email address'], ['phone', 'Phone number'], ['institution', 'Institution / Organization']].map(([name, label]) => <label key={name} className="block text-sm font-semibold">{label}<input required value={form[name]} onChange={(event) => setForm({ ...form, [name]: event.target.value })} type={name === 'email' ? 'email' : 'text'} className="mt-1 w-full rounded-lg border border-brand-cream-light bg-white px-3 py-2.5 font-normal" /></label>)}<label className="block text-sm font-semibold">Role / Department<select required value={form.role} onChange={(event) => setForm({ ...form, role: event.target.value })} className="mt-1 w-full rounded-lg border border-brand-cream-light bg-white px-3 py-2.5 font-normal"><option value="">Select a role</option>{ROLES.map((role) => <option key={role}>{role}</option>)}</select></label><label className="block text-sm font-semibold">Interview method & accommodation requests<textarea value={form.interview_preferences} onChange={(event) => setForm({ ...form, interview_preferences: event.target.value })} placeholder="Preferred method for interview (e.g. Google Meet, Zoom), specific needs, or accommodation requests..." className="mt-1 min-h-28 w-full rounded-lg border border-brand-cream-light bg-white px-3 py-2.5 font-normal" /></label><button disabled={!selectedSlot} className="w-full rounded-xl bg-brand-gold px-4 py-3 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">Confirm & reserve slot</button></div></form>
       </section>
-      {view === 'admin' && <section className="space-y-6 rounded-3xl border border-brand-cream-light bg-brand-card p-5 sm:p-7"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Protected interviewer hub</p><h2 className="text-2xl font-bold">Weekly delegation dashboard</h2></div>{session ? <button onClick={() => supabase.auth.signOut()} className="inline-flex items-center gap-2 rounded-xl border border-brand-cream-light px-4 py-2 text-sm font-semibold"><LogOut className="h-4 w-4" />Sign out</button> : <button onClick={signIn} className="inline-flex items-center gap-2 rounded-xl bg-brand-charcoal px-4 py-2 text-sm font-semibold text-white"><LogIn className="h-4 w-4" />Sign in with Google</button>}</div>{!session ? <div className="rounded-2xl bg-brand-cream p-5 text-sm text-brand-body"><ShieldCheck className="mb-2 h-6 w-6 text-brand-forest" />Only active interviewers in the Supabase allowlist can view candidates and assign sessions. Google Calendar permission is requested during sign-in.</div> : <><div className="grid grid-cols-3 gap-3"><Stat value={slots.length} label="Weekly slots" /><Stat value={bookedCount} label="Booked" /><Stat value={assignedCount} label="Assigned" /></div><div className="grid gap-6 lg:grid-cols-[1fr_320px]"><div className="space-y-3">{slots.map((slot) => <div key={slot.id} className="flex flex-col justify-between gap-3 rounded-xl border border-brand-cream-light bg-white p-4 sm:flex-row sm:items-center"><div><p className="font-bold">{formatDate(slot.slot_date)} · {formatTime(slot.starts_at)}</p><p className="text-xs uppercase tracking-wide text-brand-body">{slot.status}</p></div>{slot.status !== 'available' && <select value={slot.interviewer_id || ''} onChange={(event) => assign(slot.id, event.target.value)} className="rounded-lg border border-brand-cream-light px-3 py-2 text-sm"><option value="">Assign interviewer</option>{interviewers.map((person) => <option key={person.id} value={person.id}>{person.full_name}</option>)}</select>}</div>)}</div><div className="rounded-2xl bg-brand-cream p-4"><h3 className="mb-3 font-bold">Workload</h3><canvas ref={chartRef} aria-label="Interview allocation per interviewer" role="img" /><div className="mt-4 flex gap-2"><button onClick={loadSlots} className="inline-flex items-center gap-2 rounded-lg border border-brand-cream-light bg-white px-3 py-2 text-xs font-semibold"><RefreshCw className="h-3.5 w-3.5" />Refresh</button><span className="text-xs text-brand-body">Use the confirmed booking details to create a Google Calendar event.</span></div></div></div></>}</section>}
+      {view === 'admin' && <section className="space-y-6 rounded-3xl border border-brand-cream-light bg-brand-card p-5 sm:p-7"><div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><p className="text-xs font-bold uppercase tracking-widest text-brand-gold">Protected interviewer hub</p><h2 className="text-2xl font-bold">Weekly delegation dashboard</h2></div>{session ? <button onClick={() => supabase.auth.signOut()} className="inline-flex items-center gap-2 rounded-xl border border-brand-cream-light px-4 py-2 text-sm font-semibold"><LogOut className="h-4 w-4" />Sign out</button> : <button onClick={signIn} className="inline-flex items-center gap-2 rounded-xl bg-brand-charcoal px-4 py-2 text-sm font-semibold text-white"><LogIn className="h-4 w-4" />Sign in with Google</button>}</div>{!session ? <div className="rounded-2xl bg-brand-cream p-5 text-sm text-brand-body"><ShieldCheck className="mb-2 h-6 w-6 text-brand-forest" />Only active interviewers in the Supabase allowlist can view candidates and assign sessions. Google Calendar permission is requested during sign-in.</div> : !interviewer ? <div className="rounded-2xl bg-brand-cream p-5 text-sm text-brand-body"><ShieldCheck className="mb-2 h-6 w-6 text-brand-forest" />This account does not match an active interviewer record.</div> : <><div className="grid grid-cols-3 gap-3"><Stat value={slots.length} label="Weekly slots" /><Stat value={bookedCount} label="Booked" /><Stat value={assignedCount} label="Assigned" /></div><div className="grid gap-6 lg:grid-cols-[1fr_320px]"><div className="space-y-3">{slots.map((slot) => <div key={slot.id} className="flex flex-col justify-between gap-3 rounded-xl border border-brand-cream-light bg-white p-4 sm:flex-row sm:items-center"><div><p className="font-bold">{formatDate(slot.slot_date)} · {formatTime(slot.starts_at)}</p><p className="text-xs uppercase tracking-wide text-brand-body">{slot.status}</p></div>{slot.status === 'booked' && !slot.interviewer_id && <button type="button" onClick={() => claim(slot.id)} className="rounded-lg bg-brand-gold px-3 py-2 text-sm font-semibold text-white">Claim</button>}{slot.interviewer_id && <p className="text-sm font-semibold text-brand-forest">Assigned</p>}</div>)}</div><div className="rounded-2xl bg-brand-cream p-4"><h3 className="mb-3 font-bold">Workload</h3><canvas ref={chartRef} aria-label="Interview allocation per interviewer" role="img" /><div className="mt-4 flex gap-2"><button onClick={loadSlots} className="inline-flex items-center gap-2 rounded-lg border border-brand-cream-light bg-white px-3 py-2 text-xs font-semibold"><RefreshCw className="h-3.5 w-3.5" />Refresh</button><span className="text-xs text-brand-body">Use the confirmed booking details to create a Google Calendar event.</span></div></div></div></>}</section>}
       <footer className="flex items-center gap-2 pb-6 text-xs text-brand-body"><CalendarDays className="h-4 w-4" />Calendar invites are generated from confirmed booking details. No sample bookings are displayed.</footer>
     </div>
   </div>;
