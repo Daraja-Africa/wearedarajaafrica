@@ -85,7 +85,15 @@ export default function InterviewScheduler() {
   const book = async (event) => {
     event.preventDefault(); setError(''); setMessage('');
     if (!selectedSlot) return setError('Choose an available time slot first.');
-    const { data, error: bookingError } = await supabase.rpc('book_interview', { p_slot_id: selectedSlot.id, ...form });
+    const { data, error: bookingError } = await supabase.rpc('book_interview', {
+      p_slot_id: selectedSlot.id,
+      p_full_name: form.full_name,
+      p_email: form.email,
+      p_phone: form.phone,
+      p_institution: form.institution,
+      p_role: form.role,
+      p_interview_preferences: form.interview_preferences || null,
+    });
     if (bookingError) return setError(bookingError.message);
     const booked = { ...data[0], ...form };
     setConfirmed({ slot: booked, applicant: form });
