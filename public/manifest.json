@@ -1,0 +1,9 @@
+{
+  "name": "Daraja Africa Network",
+  "short_name": "Daraja Africa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": []
+}
